@@ -4,6 +4,7 @@
 **Estudiantes:**
 - Carlos Emilio Elizalde Hurtado
 - Emilio Juarez Avalos
+- Juan Pablo Medina Esquivel
 
 **Fecha de entrega:** 29 de septiembre del 2025
 
