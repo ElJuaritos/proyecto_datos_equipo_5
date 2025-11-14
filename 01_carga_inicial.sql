@@ -33,7 +33,14 @@ CREATE TABLE agua_cdmx.reportes (
 
 -- Paso 6: Cargar datos desde el CSV
 -- IMPORTANTE: Cambiar la ruta por la ubicación de tu archivo
-\copy agua_cdmx.reportes FROM 'C:\Users\eajae\OneDrive\Escritorio\Datos\proyecto_datos_equipo_5\reportes_agua_2024_01.csv' DELIMITER ',' CSV HEADER;
+-- Se usa LATIN1 que es más tolerante con caracteres especiales de Windows
+\copy agua_cdmx.reportes FROM 'C:\Users\eajae\OneDrive\Escritorio\Datos\proyecto_datos_equipo_5\reportes_agua_2024_01.csv' DELIMITER ',' CSV HEADER ENCODING 'LATIN1';
+
+-- SI SIGUE DANDO ERROR, usa el script de Python para convertir a UTF-8:
+-- 1. Ejecuta: pip install -r requirements.txt
+-- 2. Ejecuta: python convertir_csv_utf8.py
+-- 3. Luego usa esta línea (descomenta y comenta la de arriba):
+-- \copy agua_cdmx.reportes FROM 'C:\Users\eajae\OneDrive\Escritorio\Datos\proyecto_datos_equipo_5\reportes_agua_2024_01_utf8.csv' DELIMITER ',' CSV HEADER;
 
 -- Paso 7: Verificar que se cargaron los datos
 SELECT COUNT(*) AS total_registros FROM agua_cdmx.reportes;
