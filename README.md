@@ -163,3 +163,84 @@ Se realizaron las siguientes actividades de limpieza documentadas en el script `
 ### Justificación de las operaciones
 
 Todas las operaciones de limpieza fueron necesarias para preparar el dataset para análisis posteriores. Las conversiones de tipo de dato (fechas y coordenadas) permiten realizar cálculos y análisis que no serían posibles con datos en formato texto. La normalización de valores categóricos y la eliminación de duplicados mejoran la calidad y consistencia del dataset. El respaldo de los datos originales garantiza que siempre se puede volver al estado inicial si es necesario revisar o modificar el proceso de limpieza.
+
+## D) Normalización de datos hasta 4NF 
+   **Columnas originales:**
+folio_incidente
+fecha_registro_incidente
+id_reporte
+fecha_reporte
+hora_reporte
+clasificacion
+reporte
+medio_recepcion
+alcaldia_catalogo
+colonia_catalogo
+longitud
+latitud
+   **Entidades intuitivas propuestas:**
+INCIDENTE (información del fenómeno/avería)
+REPORTE (cada entrada/llamada/registro que notifica un incidente)
+UBICACION (datos geográficos/colonia/alcaldía)
+
+   **Dependencias funcionales y multivaluadas (no triviales)**
+         **Dependencias funcionales (DF)**
+folio_incidente → fecha_registro_incidente
+folio_incidente → clasificacion
+folio_incidente → reporte
+folio_incidente → colonia_catalogo
+id_reporte → fecha_reporte
+id_reporte → hora_reporte
+id_reporte → medio_recepcion
+colonia_catalogo → alcaldia_catalogo
+colonia_catalogo → longitud, latitud
+         **Dependencias multivaluadas (MVD)**
+folio_incidente ↠ id_reporte : un mismo incidente puede generar múltiples reportes (múltiples llamadas/reports asociados al mismo folio).
+         **Comentarios sobre la naturaleza**
+colonia_catalogo determina alcaldía y coordenadas: esto sugiere que UBICACION debe ser su propia entidad (evita transiciones y redundancia).
+folio_incidente identifica un suceso con sus atributos (fecha, clasificación, descripción) y está relacionado con varios id_reporte.
+
+ **DISEÑO EN 4NF** 
+ 
+ **Entidad INCIDENTE**
+   columna
+id_incidente (PK artificial)
+folio_incidente (unique)
+fecha_registro_incidente
+clasificacion
+reporte
+colonia_catalogo FK
+
+**Entidad REPORTE**
+   columna
+id_reporte (PK artificial)
+folio_incidente FK
+fecha_reporte
+hora_reporte
+medio_recepcion
+
+**Entidad UBICACION**
+   columna
+id_colonia (PK artificial)
+colonia_catalogo
+alcaldia_catalogo
+longitud
+latitud
+
+**Normalización paso a paso hasta 4NF (justificaciones)**
+1NF - Todas las columnas son atómicas (texto/tiempo/fecha). 1NF satisfecha.
+
+2NF - No existe llave compuesta en la tabla original (se trata cada fila como registro), por tanto 2NF trivialmente satisfecha.
+
+3NF - Detectamos dependencias transitivas: folio_incidente → colonia_catalogo y colonia_catalogo → alcaldia_catalogo, longitud, latitud. Para eliminar la transitividad creamos la entidad UBICACION con colonia_catalogo como atributo clave (o id_colonia PK artificial).
+
+Proyección a 3NF: 
+INCIDENTE(folio_incidente, fecha_registro_incidente, clasificacion, reporte, id_colonia)
+UBICACION(id_colonia, colonia_catalogo, alcaldia_catalogo, longitud, latitud)
+
+4NF - La presencia de folio_incidente ↠ id_reporte (MVD) implica que la tabla original almacena dos grupos de atributos independientes: atributos del INCIDENTE y atributos del REPORTE. Para eliminar la MVD separamos en tablas INCIDENTE y REPORTE.
+**Justificación:** Con esta descomposición cada relación está libre de dependencias multivaluadas no triviales; las proyecciones preservan la información y permiten reconstruir la tabla original mediante JOINs (salvo pérdida de orden/duplicados inherentes al registro original) y se genera una clave primaria artificial en cada entidad.
+
+<img width="1536" height="1024" alt="imgerdbdagua" src="https://github.com/user-attachments/assets/64869bb6-743c-4439-8b5f-fd8b3d20a94a" />
+
+
