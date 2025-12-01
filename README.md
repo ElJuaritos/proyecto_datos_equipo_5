@@ -272,249 +272,13 @@ UBICACION(id_colonia, colonia_catalogo, alcaldia_catalogo, longitud, latitud)
 - Se eliminan anomalías de actualización (cambiar un nombre de clasificación solo requiere un UPDATE en CLASIFICACION).
 - Se preserva la integridad referencial mediante claves foráneas apropiadas.
 
-<img width="1536" height="1024" alt="imgerdbdagua" src="https://github.com/user-attachments/assets/64869bb6-743c-4439-8b5f-fd8b3d20a94a" />
+<img width="2283" height="2503" alt="Untitled diagram-2025-12-01-170852" src="https://github.com/user-attachments/assets/4a27c515-fa49-4019-8c4f-6a6ce5a7bb0e" />
 
 📋 **Para ver el diagrama ER detallado con cardinalidades, dependencias funcionales y ejemplos, consultar:** [`diagrama_er_5nf.md`](diagrama_er_5nf.md)
 
 ---
 
-## E) Análisis de datos a través de consultas SQL y creación de atributos analíticos
-
-### Descripción
-
-Utilizando los datos normalizados en 5NF, se crearon consultas SQL avanzadas que emplean **funciones de ventana** (window functions) para generar atributos analíticos enriquecidos. Estos atributos permiten análisis más profundos y toma de decisiones basada en datos.
-
-### Archivo: `07_analisis_avanzado.sql`
-
-Este script contiene **10 consultas analíticas** que atacan directamente el objetivo del proyecto:
-
-#### 1. **Ranking de Colonias Más Afectadas**
-- Utiliza `RANK()` y `PARTITION BY` para clasificar colonias por alcaldía
-- Atributos creados: `ranking_en_alcaldia`, `ranking_general`, `porcentaje_en_alcaldia`
-
-#### 2. **Tendencia Temporal con Comparaciones**
-- Usa `LAG()` para comparar con mes anterior
-- Atributos: `reportes_mes_anterior`, `variacion_porcentual`, `media_movil_3meses`
-
-#### 3. **Tiempo de Atención a Reportes**
-- Calcula diferencia entre reporte e incidente
-- Atributos: `dias_diferencia`, `ranking_rapidez`, `percentil`, `cuartil`
-
-#### 4. **Frecuencia y Criticidad por Colonia**
-- Score compuesto multi-dimensional
-- Atributos: `categoria_frecuencia`, `score_criticidad`, `promedio_reportes_por_incidente`
-
-#### 5. **Patrones Horarios por Día**
-- Análisis de demanda temporal
-- Atributos: `categoria_horario`, `porcentaje_del_dia`, `ranking_hora_dia`
-
-#### 6. **Incidentes Recurrentes**
-- Identifica problemas sistemáticos
-- Atributos: `nivel_reincidencia`, `veces_reportado`, `dias_entre_primero_ultimo`
-
-#### 7. **Clustering Geográfico**
-- Agrupa por coordenadas
-- Atributos: `densidad_incidentes`, `categoria_zona`, `decil_incidentes`
-
-#### 8. **Eficiencia por Canal**
-- Evalúa medios de recepción
-- Atributos: `categoria_velocidad`, `dias_promedio_registro`, `ranking_rapidez`
-
-#### 9. **Scorecard Comparativo de Alcaldías**
-- Métrica compuesta de priorización
-- Atributos: `score_prioridad`, `quintil_gravedad`, múltiples rankings
-
-#### 10. **Estacionalidad Trimestral**
-- Patrones anuales con `LAG()`
-- Atributos: `variacion_porcentual`, `media_movil_4_trimestres`
-
-### Resultados e Interpretación: `ANALISIS_RESULTADOS.md`
-
-Documento completo con:
-- 📊 **Tablas de resultados** para cada consulta
-- 📈 **Gráficas conceptuales** de tendencias
-- 🔍 **Interpretación detallada** de cada hallazgo
-- 💡 **Recomendaciones estratégicas** basadas en datos
-- 🎯 **Conclusiones** respecto al objetivo del proyecto
-
-#### Hallazgos Principales
-
-1. **Concentración Geográfica**: 40% de incidentes en 15% de colonias (zona oriente)
-2. **Estacionalidad**: Q2 (Abr-Jun) requiere 50% más recursos que Q1
-3. **Reincidencia**: Top 100 ubicaciones representan 60% del trabajo reactivo
-4. **Brecha Digital**: Solo 2% de reportes vía digital, perdiendo eficiencia
-5. **Tiempo de Respuesta**: 50% atendidos en ≤2 días, pero 25% en >5 días
-
-📊 **Para ver resultados completos con interpretación:** [`ANALISIS_RESULTADOS.md`](ANALISIS_RESULTADOS.md)
-
----
-
-## F) Creación de APIs con FastAPI
-
-### Descripción
-
-Se implementó una **API RESTful completa** usando FastAPI con operaciones CRUD para todas las tablas normalizadas del schema 5NF.
-
-### Estructura de la API
-
-```
-api/
-├── main.py                 # Aplicación principal FastAPI
-├── database.py             # Configuración SQLAlchemy y conexión MySQL
-├── models.py               # Modelos ORM (SQLAlchemy)
-├── schemas.py              # Schemas Pydantic (validación)
-├── crud.py                 # Operaciones CRUD reutilizables
-├── requirements.txt        # Dependencias del proyecto
-├── env.example             # Template de configuración
-├── README_API.md           # Documentación completa de la API
-└── routers/                # Endpoints organizados por entidad
-    ├── clasificacion.py    # CRUD Clasificación
-    ├── medio_recepcion.py  # CRUD Medio Recepción
-    ├── ubicacion.py        # CRUD Ubicación
-    ├── incidente.py        # CRUD Incidente
-    └── reporte.py          # CRUD Reporte
-```
-
-### Características Implementadas
-
-✅ **Operaciones CRUD Completas** para las 5 tablas:
-- `POST` - Crear registros
-- `GET` - Leer (individual y listado)
-- `PUT` - Actualizar registros
-- `DELETE` - Eliminar registros
-
-✅ **Validaciones Automáticas** con Pydantic:
-- Validación de tipos de datos
-- Rangos de coordenadas para CDMX
-- Unicidad de folios y códigos
-- Integridad referencial
-
-✅ **Filtros y Paginación**:
-- Filtrar por alcaldía en ubicaciones
-- Filtrar por clasificación/estado en incidentes
-- Paginación con `skip` y `limit`
-
-✅ **Documentación Interactiva**:
-- Swagger UI en `/docs`
-- ReDoc en `/redoc`
-- Schema OpenAPI 3.0
-
-✅ **Características Avanzadas**:
-- CORS habilitado
-- Middleware de logging
-- Health checks
-- Manejo global de errores
-
-### Configuración del Ambiente
-
-#### 1. Instalar dependencias:
-
-```bash
-cd api
-python -m venv venv
-venv\Scripts\activate  # Windows
-pip install -r requirements.txt
-```
-
-#### 2. Configurar base de datos:
-
-Copiar `env.example` a `.env` y editar:
-
-```env
-DB_USER=root
-DB_PASSWORD=tu_password
-DB_HOST=localhost
-DB_PORT=3306
-DB_NAME=reportes_agua_cdmx
-```
-
-#### 3. Ejecutar el servicio:
-
-```bash
-python main.py
-```
-
-O usando uvicorn:
-
-```bash
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
-```
-
-### Endpoints Disponibles
-
-Todos los endpoints están bajo el prefijo `/api/v1`:
-
-| Entidad | Endpoint Base | Operaciones |
-|---------|---------------|-------------|
-| Clasificaciones | `/api/v1/clasificaciones/` | POST, GET, GET/{id}, PUT/{id}, DELETE/{id} |
-| Medios Recepción | `/api/v1/medios-recepcion/` | POST, GET, GET/{id}, PUT/{id}, DELETE/{id} |
-| Ubicaciones | `/api/v1/ubicaciones/` | POST, GET, GET/{id}, PUT/{id}, DELETE/{id} |
-| Incidentes | `/api/v1/incidentes/` | POST, GET, GET/{id}, GET/folio/{folio}, PUT/{id}, DELETE/{id} |
-| Reportes | `/api/v1/reportes/` | POST, GET, GET/{id}, GET/codigo/{codigo}, PUT/{id}, DELETE/{id} |
-
-### Ejemplos de Uso
-
-#### Crear un Incidente:
-
-```bash
-curl -X POST "http://localhost:8000/api/v1/incidentes/" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "folio_incidente": "I-20221201-9999",
-    "fecha_registro_incidente": "2022-12-01",
-    "reporte": "Fuga de agua en calle principal",
-    "id_clasificacion": 1,
-    "id_colonia": 5,
-    "estado": "Registrado"
-  }'
-```
-
-#### Listar Incidentes con Filtros:
-
-```bash
-curl "http://localhost:8000/api/v1/incidentes/?clasificacion_id=1&skip=0&limit=10"
-```
-
-#### Obtener Incidente por Folio:
-
-```bash
-curl "http://localhost:8000/api/v1/incidentes/folio/I-20221201-9999"
-```
-
-### Interacción desde Python:
-
-```python
-import requests
-
-BASE_URL = "http://localhost:8000/api/v1"
-
-# Crear ubicación
-nueva_ubicacion = {
-    "colonia_catalogo": "Roma Norte",
-    "alcaldia_catalogo": "Cuauhtémoc",
-    "longitud": -99.1627,
-    "latitud": 19.4186,
-    "activo": True
-}
-
-response = requests.post(f"{BASE_URL}/ubicaciones/", json=nueva_ubicacion)
-print(response.json())
-```
-
-### Documentación Completa
-
-📖 **Para documentación detallada, ejemplos completos y troubleshooting:** [`api/README_API.md`](api/README_API.md)
-
-### Swagger UI
-
-Una vez iniciado el servicio, acceder a:
-- **Documentación Interactiva**: http://localhost:8000/docs
-- **Documentación ReDoc**: http://localhost:8000/redoc
-- **Health Check**: http://localhost:8000/health
-
----
-
-## G) Archivos SQL del Proyecto
+## E) Archivos SQL del Proyecto
 
 El proyecto incluye los siguientes archivos SQL organizados para facilitar la implementación y uso del sistema normalizado:
 
@@ -530,18 +294,70 @@ Consultas SQL para análisis exploratorio de datos, estadísticas descriptivas y
 Procesos de limpieza y transformación de datos: eliminación de duplicados, normalización de valores, corrección de inconsistencias.
 
 #### 📄 `04_schema_5nf.sql` ⭐
-Schema de base de datos normalizado hasta 5NF con las 5 tablas, claves foráneas, índices y constraints.
+**Schema de base de datos normalizado hasta 5NF**
+
+Define la estructura completa de las 5 tablas normalizadas:
+- **CLASIFICACION**: Catálogo de tipos de incidentes
+- **MEDIO_RECEPCION**: Catálogo de canales de recepción
+- **UBICACION**: Datos geográficos (colonias, alcaldías, coordenadas)
+- **INCIDENTE**: Entidad principal de eventos reportados
+- **REPORTE**: Registros individuales de notificaciones
+
+Incluye:
+- Claves primarias y foráneas
+- Índices optimizados para consultas frecuentes
+- Constraints de integridad referencial
+- Comentarios detallados sobre el diseño
 
 #### 📄 `05_migracion_a_5nf.sql` ⭐
-Script de migración y carga de datos desde CSV a las tablas normalizadas con limpieza automática.
+**Script de migración y carga de datos a 5NF**
+
+Transforma los datos del CSV original a las tablas normalizadas mediante:
+1. Creación de tabla temporal para carga del CSV
+2. Extracción y carga de catálogos (CLASIFICACION, MEDIO_RECEPCION)
+3. Normalización de ubicaciones con validación de coordenadas
+4. Carga de incidentes con relaciones FK apropiadas
+5. Carga de reportes con integridad referencial
+6. Estadísticas y validación de la migración
+
+Características:
+- Limpieza automática de datos (valores NA, espacios, validaciones)
+- Manejo de duplicados con ON DUPLICATE KEY UPDATE
+- Conversión de formatos de fecha y hora
+- Reportes de calidad de datos y verificación de integridad
 
 #### 📄 `06_consultas_ejemplo_5nf.sql` ⭐
-Consultas SQL de ejemplo para análisis básicos, estadísticos, temporales y de calidad de datos.
+**Consultas de ejemplo y análisis**
 
-#### 📄 `07_analisis_avanzado.sql` ⭐ **NUEVO**
-Consultas avanzadas con funciones de ventana para crear atributos analíticos enriquecidos.
+Colección de consultas SQL organizadas por categoría:
+
+**Consultas Básicas:**
+- Listar incidentes y reportes con información completa
+
+**Análisis Estadísticos:**
+- Distribución por clasificación, medio de recepción, ubicación
+- Top colonias y alcaldías con más incidentes
+
+**Análisis Temporales:**
+- Incidentes por mes, día de la semana, hora del día
+- Análisis de tiempos de respuesta
+
+**Consultas Avanzadas:**
+- Incidentes con múltiples reportes
+- Matriz clasificación vs alcaldía
+- Análisis geoespaciales y clustering
+
+**Calidad de Datos:**
+- Validación de integridad
+- Detección de registros incompletos
+
+**Vistas Útiles:**
+- `v_incidentes_completos`
+- `v_reportes_completos`
 
 ### 🚀 Orden de Ejecución Recomendado
+
+Para implementar el sistema completo desde cero:
 
 ```bash
 # 1. Crear el schema normalizado
@@ -550,10 +366,23 @@ mysql -u usuario -p nombre_bd < 04_schema_5nf.sql
 # 2. Ejecutar la migración de datos
 mysql -u usuario -p nombre_bd < 05_migracion_a_5nf.sql
 
-# 3. Ejecutar análisis avanzado
-mysql -u usuario -p nombre_bd < 07_analisis_avanzado.sql
+# 3. Probar consultas de ejemplo
+mysql -u usuario -p nombre_bd < 06_consultas_ejemplo_5nf.sql
 ```
 
-📖 **Para instrucciones detalladas:** [`GUIA_IMPLEMENTACION.md`](GUIA_IMPLEMENTACION.md)
+📖 **Para instrucciones detalladas paso a paso, incluyendo solución de problemas y métodos alternativos de carga, consultar:** [`GUIA_IMPLEMENTACION.md`](GUIA_IMPLEMENTACION.md)
+
+### 📊 Beneficios del Diseño en 5NF
+
+1. **Eliminación de redundancia**: Los catálogos se mantienen una sola vez
+2. **Integridad referencial**: Las FK garantizan consistencia de datos
+3. **Mantenimiento simplificado**: Actualizar un catálogo afecta automáticamente todas las referencias
+4. **Escalabilidad**: Fácil agregar nuevos catálogos o atributos
+5. **Performance optimizado**: Índices estratégicos en joins frecuentes
+6. **Sin anomalías**: No hay problemas de inserción, actualización o eliminación
+
+### 🔍 Verificación del Diseño
+
+El diseño puede verificarse reconstruyendo la tabla original mediante un JOIN completo de las 5 tablas, demostrando que la descomposición es **sin pérdida de información** (lossless decomposition), requisito fundamental de la normalización hasta 5NF.
 
 
