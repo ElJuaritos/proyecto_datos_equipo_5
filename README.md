@@ -164,7 +164,7 @@ Se realizaron las siguientes actividades de limpieza documentadas en el script `
 
 Todas las operaciones de limpieza fueron necesarias para preparar el dataset para análisis posteriores. Las conversiones de tipo de dato (fechas y coordenadas) permiten realizar cálculos y análisis que no serían posibles con datos en formato texto. La normalización de valores categóricos y la eliminación de duplicados mejoran la calidad y consistencia del dataset. El respaldo de los datos originales garantiza que siempre se puede volver al estado inicial si es necesario revisar o modificar el proceso de limpieza.
 
-## D) Normalización de datos hasta 4NF 
+## D) Normalización de datos hasta 5NF 
    **Columnas originales:**
 folio_incidente
 fecha_registro_incidente
@@ -182,6 +182,8 @@ latitud
 INCIDENTE (información del fenómeno/avería)
 REPORTE (cada entrada/llamada/registro que notifica un incidente)
 UBICACION (datos geográficos/colonia/alcaldía)
+CLASIFICACION (catálogo de tipos de incidentes)
+MEDIO_RECEPCION (catálogo de canales de recepción)
 
    **Dependencias funcionales y multivaluadas (no triviales)**
          **Dependencias funcionales (DF)**
@@ -196,51 +198,191 @@ colonia_catalogo → alcaldia_catalogo
 colonia_catalogo → longitud, latitud
          **Dependencias multivaluadas (MVD)**
 folio_incidente ↠ id_reporte : un mismo incidente puede generar múltiples reportes (múltiples llamadas/reports asociados al mismo folio).
+         **Dependencias de Join (JD)**
+Una dependencia de join existe cuando la información puede descomponerse en proyecciones más pequeñas que pueden reconstruirse mediante joins sin pérdida de información. En este caso:
+- (INCIDENTE, CLASIFICACION) ⋈ (INCIDENTE, UBICACION) ⋈ (INCIDENTE, REPORTE) ⋈ (REPORTE, MEDIO_RECEPCION)
          **Comentarios sobre la naturaleza**
 colonia_catalogo determina alcaldía y coordenadas: esto sugiere que UBICACION debe ser su propia entidad (evita transiciones y redundancia).
 folio_incidente identifica un suceso con sus atributos (fecha, clasificación, descripción) y está relacionado con varios id_reporte.
+clasificacion y medio_recepcion son catálogos que deben normalizarse para evitar redundancia y facilitar mantenimiento.
 
- **DISEÑO EN 4NF** 
+ **DISEÑO EN 5NF** 
  
  **Entidad INCIDENTE**
    columna
 id_incidente (PK artificial)
 folio_incidente (unique)
 fecha_registro_incidente
-clasificacion
-reporte
-colonia_catalogo FK
+reporte (descripción textual del incidente)
+id_clasificacion FK
+id_colonia FK
 
 **Entidad REPORTE**
    columna
 id_reporte (PK artificial)
-folio_incidente FK
+id_incidente FK (referencia a INCIDENTE, no folio_incidente)
 fecha_reporte
 hora_reporte
-medio_recepcion
+id_medio_recepcion FK
 
 **Entidad UBICACION**
    columna
 id_colonia (PK artificial)
-colonia_catalogo
+colonia_catalogo (unique)
 alcaldia_catalogo
 longitud
 latitud
 
-**Normalización paso a paso hasta 4NF (justificaciones)**
-1NF - Todas las columnas son atómicas (texto/tiempo/fecha). 1NF satisfecha.
+**Entidad CLASIFICACION**
+   columna
+id_clasificacion (PK artificial)
+nombre_clasificacion (unique)
+descripcion (opcional)
 
-2NF - No existe llave compuesta en la tabla original (se trata cada fila como registro), por tanto 2NF trivialmente satisfecha.
+**Entidad MEDIO_RECEPCION**
+   columna
+id_medio_recepcion (PK artificial)
+nombre_medio (unique)
+descripcion (opcional)
 
-3NF - Detectamos dependencias transitivas: folio_incidente → colonia_catalogo y colonia_catalogo → alcaldia_catalogo, longitud, latitud. Para eliminar la transitividad creamos la entidad UBICACION con colonia_catalogo como atributo clave (o id_colonia PK artificial).
+**Normalización paso a paso hasta 5NF (justificaciones)**
+
+**1NF** - Todas las columnas son atómicas (texto/tiempo/fecha). 1NF satisfecha.
+
+**2NF** - No existe llave compuesta en la tabla original (se trata cada fila como registro), por tanto 2NF trivialmente satisfecha.
+
+**3NF** - Detectamos dependencias transitivas: folio_incidente → colonia_catalogo y colonia_catalogo → alcaldia_catalogo, longitud, latitud. Para eliminar la transitividad creamos la entidad UBICACION con colonia_catalogo como atributo clave (o id_colonia PK artificial).
 
 Proyección a 3NF: 
 INCIDENTE(folio_incidente, fecha_registro_incidente, clasificacion, reporte, id_colonia)
 UBICACION(id_colonia, colonia_catalogo, alcaldia_catalogo, longitud, latitud)
 
-4NF - La presencia de folio_incidente ↠ id_reporte (MVD) implica que la tabla original almacena dos grupos de atributos independientes: atributos del INCIDENTE y atributos del REPORTE. Para eliminar la MVD separamos en tablas INCIDENTE y REPORTE.
-**Justificación:** Con esta descomposición cada relación está libre de dependencias multivaluadas no triviales; las proyecciones preservan la información y permiten reconstruir la tabla original mediante JOINs (salvo pérdida de orden/duplicados inherentes al registro original) y se genera una clave primaria artificial en cada entidad.
+**4NF** - La presencia de folio_incidente ↠ id_reporte (MVD) implica que la tabla original almacena dos grupos de atributos independientes: atributos del INCIDENTE y atributos del REPORTE. Para eliminar la MVD separamos en tablas INCIDENTE y REPORTE.
+
+**5NF** - Identificamos dependencias de join adicionales donde los catálogos (clasificacion, medio_recepcion) pueden descomponerse en entidades independientes:
+1. **CLASIFICACION**: Los valores de clasificación se repiten en múltiples incidentes. Al extraer a una tabla separada eliminamos redundancia y permitimos mantener un catálogo centralizado con posibles atributos adicionales (descripción, prioridad, etc.).
+2. **MEDIO_RECEPCION**: Los medios de recepción se repiten en múltiples reportes. La separación permite gestionar el catálogo de canales independientemente.
+3. **Relación INCIDENTE-FK**: Cambiamos la FK de REPORTE de folio_incidente a id_incidente para mantener integridad referencial con claves artificiales.
+
+**Justificación 5NF:** 
+- Cada tabla representa un único concepto/entidad.
+- No existen dependencias de join no triviales que permitan mayor descomposición sin pérdida de información.
+- Los catálogos están normalizados, facilitando mantenimiento y consistencia.
+- Las proyecciones pueden reconstruir la información original mediante joins naturales.
+- Se eliminan anomalías de actualización (cambiar un nombre de clasificación solo requiere un UPDATE en CLASIFICACION).
+- Se preserva la integridad referencial mediante claves foráneas apropiadas.
 
 <img width="1536" height="1024" alt="imgerdbdagua" src="https://github.com/user-attachments/assets/64869bb6-743c-4439-8b5f-fd8b3d20a94a" />
+
+📋 **Para ver el diagrama ER detallado con cardinalidades, dependencias funcionales y ejemplos, consultar:** [`diagrama_er_5nf.md`](diagrama_er_5nf.md)
+
+---
+
+## E) Archivos SQL del Proyecto
+
+El proyecto incluye los siguientes archivos SQL organizados para facilitar la implementación y uso del sistema normalizado:
+
+### Archivos Principales
+
+#### 📄 `01_carga_inicial.sql`
+Script inicial para la carga de datos desde el archivo CSV original.
+
+#### 📄 `02_analisis_exploratorio.sql`
+Consultas SQL para análisis exploratorio de datos, estadísticas descriptivas y detección de patrones en los reportes de agua.
+
+#### 📄 `03_limpieza_datos.sql`
+Procesos de limpieza y transformación de datos: eliminación de duplicados, normalización de valores, corrección de inconsistencias.
+
+#### 📄 `04_schema_5nf.sql` ⭐
+**Schema de base de datos normalizado hasta 5NF**
+
+Define la estructura completa de las 5 tablas normalizadas:
+- **CLASIFICACION**: Catálogo de tipos de incidentes
+- **MEDIO_RECEPCION**: Catálogo de canales de recepción
+- **UBICACION**: Datos geográficos (colonias, alcaldías, coordenadas)
+- **INCIDENTE**: Entidad principal de eventos reportados
+- **REPORTE**: Registros individuales de notificaciones
+
+Incluye:
+- Claves primarias y foráneas
+- Índices optimizados para consultas frecuentes
+- Constraints de integridad referencial
+- Comentarios detallados sobre el diseño
+
+#### 📄 `05_migracion_a_5nf.sql` ⭐
+**Script de migración y carga de datos a 5NF**
+
+Transforma los datos del CSV original a las tablas normalizadas mediante:
+1. Creación de tabla temporal para carga del CSV
+2. Extracción y carga de catálogos (CLASIFICACION, MEDIO_RECEPCION)
+3. Normalización de ubicaciones con validación de coordenadas
+4. Carga de incidentes con relaciones FK apropiadas
+5. Carga de reportes con integridad referencial
+6. Estadísticas y validación de la migración
+
+Características:
+- Limpieza automática de datos (valores NA, espacios, validaciones)
+- Manejo de duplicados con ON DUPLICATE KEY UPDATE
+- Conversión de formatos de fecha y hora
+- Reportes de calidad de datos y verificación de integridad
+
+#### 📄 `06_consultas_ejemplo_5nf.sql` ⭐
+**Consultas de ejemplo y análisis**
+
+Colección de consultas SQL organizadas por categoría:
+
+**Consultas Básicas:**
+- Listar incidentes y reportes con información completa
+
+**Análisis Estadísticos:**
+- Distribución por clasificación, medio de recepción, ubicación
+- Top colonias y alcaldías con más incidentes
+
+**Análisis Temporales:**
+- Incidentes por mes, día de la semana, hora del día
+- Análisis de tiempos de respuesta
+
+**Consultas Avanzadas:**
+- Incidentes con múltiples reportes
+- Matriz clasificación vs alcaldía
+- Análisis geoespaciales y clustering
+
+**Calidad de Datos:**
+- Validación de integridad
+- Detección de registros incompletos
+
+**Vistas Útiles:**
+- `v_incidentes_completos`
+- `v_reportes_completos`
+
+### 🚀 Orden de Ejecución Recomendado
+
+Para implementar el sistema completo desde cero:
+
+```bash
+# 1. Crear el schema normalizado
+mysql -u usuario -p nombre_bd < 04_schema_5nf.sql
+
+# 2. Ejecutar la migración de datos
+mysql -u usuario -p nombre_bd < 05_migracion_a_5nf.sql
+
+# 3. Probar consultas de ejemplo
+mysql -u usuario -p nombre_bd < 06_consultas_ejemplo_5nf.sql
+```
+
+📖 **Para instrucciones detalladas paso a paso, incluyendo solución de problemas y métodos alternativos de carga, consultar:** [`GUIA_IMPLEMENTACION.md`](GUIA_IMPLEMENTACION.md)
+
+### 📊 Beneficios del Diseño en 5NF
+
+1. **Eliminación de redundancia**: Los catálogos se mantienen una sola vez
+2. **Integridad referencial**: Las FK garantizan consistencia de datos
+3. **Mantenimiento simplificado**: Actualizar un catálogo afecta automáticamente todas las referencias
+4. **Escalabilidad**: Fácil agregar nuevos catálogos o atributos
+5. **Performance optimizado**: Índices estratégicos en joins frecuentes
+6. **Sin anomalías**: No hay problemas de inserción, actualización o eliminación
+
+### 🔍 Verificación del Diseño
+
+El diseño puede verificarse reconstruyendo la tabla original mediante un JOIN completo de las 5 tablas, demostrando que la descomposición es **sin pérdida de información** (lossless decomposition), requisito fundamental de la normalización hasta 5NF.
 
 
