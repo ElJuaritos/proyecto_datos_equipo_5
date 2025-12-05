@@ -1,5 +1,5 @@
 """
-Configuración de la base de datos MySQL
+Configuración de la base de datos PostgreSQL
 Maneja la conexión y las sesiones de SQLAlchemy
 """
 
@@ -13,14 +13,14 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Configuración de la base de datos
-DB_USER = os.getenv("DB_USER", "root")
+DB_USER = os.getenv("DB_USER", "postgres")
 DB_PASSWORD = os.getenv("DB_PASSWORD", "")
 DB_HOST = os.getenv("DB_HOST", "localhost")
-DB_PORT = os.getenv("DB_PORT", "3306")
+DB_PORT = os.getenv("DB_PORT", "5432")
 DB_NAME = os.getenv("DB_NAME", "reportes_agua_cdmx")
 
-# URL de conexión a MySQL
-DATABASE_URL = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}?charset=utf8mb4"
+# URL de conexión a PostgreSQL
+DATABASE_URL = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
 # Crear engine de SQLAlchemy
 engine = create_engine(

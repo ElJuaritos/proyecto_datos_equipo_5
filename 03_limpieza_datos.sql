@@ -23,13 +23,18 @@ ALTER TABLE reportes
 ADD COLUMN fecha_reporte_clean DATE,
 ADD COLUMN fecha_registro_clean DATE;
 
+-- Convertir fechas con formato estadounidense M/D/YYYY o MM/DD/YYYY
 UPDATE reportes
-SET fecha_reporte_clean = TO_DATE(fecha_reporte, 'YYYY-MM-DD')
-WHERE fecha_reporte ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}$';
+SET fecha_reporte_clean = TO_DATE(TRIM(fecha_reporte), 'MM/DD/YYYY')
+WHERE TRIM(fecha_reporte) ~ '^[0-9]{1,2}/[0-9]{1,2}/[0-9]{4}$'
+  AND fecha_reporte IS NOT NULL 
+  AND fecha_reporte != '';
 
 UPDATE reportes
-SET fecha_registro_clean = TO_DATE(fecha_registro_incidente, 'YYYY-MM-DD')
-WHERE fecha_registro_incidente ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}$';
+SET fecha_registro_clean = TO_DATE(TRIM(fecha_registro_incidente), 'MM/DD/YYYY')
+WHERE TRIM(fecha_registro_incidente) ~ '^[0-9]{1,2}/[0-9]{1,2}/[0-9]{4}$'
+  AND fecha_registro_incidente IS NOT NULL 
+  AND fecha_registro_incidente != '';
 
 -- Paso 4: Limpiar coordenadas - crear columnas nuevas con tipo NUMERIC
 ALTER TABLE reportes

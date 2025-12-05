@@ -98,25 +98,25 @@ LIMIT 10;
 
 -- 7. Incidentes por mes
 SELECT 
-    DATE_FORMAT(i.fecha_registro_incidente, '%Y-%m') AS mes,
+    TO_CHAR(i.fecha_registro_incidente, 'YYYY-MM') AS mes,
     COUNT(i.id_incidente) AS total_incidentes,
     COUNT(DISTINCT i.id_colonia) AS colonias_afectadas
 FROM incidente i
-GROUP BY DATE_FORMAT(i.fecha_registro_incidente, '%Y-%m')
+GROUP BY TO_CHAR(i.fecha_registro_incidente, 'YYYY-MM')
 ORDER BY mes;
 
 -- 8. Reportes por día de la semana
 SELECT 
-    DAYNAME(r.fecha_reporte) AS dia_semana,
-    DAYOFWEEK(r.fecha_reporte) AS dia_numero,
+    TO_CHAR(r.fecha_reporte, 'Day') AS dia_semana,
+    EXTRACT(DOW FROM r.fecha_reporte) AS dia_numero,
     COUNT(r.id_reporte_pk) AS total_reportes
 FROM reporte r
-GROUP BY dia_semana, dia_numero
+GROUP BY TO_CHAR(r.fecha_reporte, 'Day'), EXTRACT(DOW FROM r.fecha_reporte)
 ORDER BY dia_numero;
 
 -- 9. Reportes por hora del día (distribución horaria)
 SELECT 
-    HOUR(r.hora_reporte) AS hora,
+    EXTRACT(HOUR FROM r.hora_reporte) AS hora,
     COUNT(r.id_reporte_pk) AS total_reportes
 FROM reporte r
 GROUP BY hora
@@ -136,13 +136,14 @@ SELECT
     COUNT(r.id_reporte_pk) AS total_reportes,
     MIN(r.fecha_reporte) AS primer_reporte,
     MAX(r.fecha_reporte) AS ultimo_reporte,
-    DATEDIFF(MAX(r.fecha_reporte), MIN(r.fecha_reporte)) AS dias_diferencia
+    (MAX(r.fecha_reporte) - MIN(r.fecha_reporte)) AS dias_diferencia
 FROM incidente i
 INNER JOIN reporte r ON i.id_incidente = r.id_incidente
 INNER JOIN clasificacion c ON i.id_clasificacion = c.id_clasificacion
 LEFT JOIN ubicacion u ON i.id_colonia = u.id_colonia
-GROUP BY i.id_incidente
-HAVING total_reportes > 1
+GROUP BY i.id_incidente, i.folio_incidente, i.reporte, c.nombre_clasificacion, 
+         u.colonia_catalogo, u.alcaldia_catalogo
+HAVING COUNT(r.id_reporte_pk) > 1
 ORDER BY total_reportes DESC, dias_diferencia DESC
 LIMIT 20;
 
@@ -161,9 +162,9 @@ ORDER BY u.alcaldia_catalogo, total_incidentes DESC;
 -- 12. Análisis de tiempo de respuesta (diferencia fecha incidente vs reporte)
 SELECT 
     c.nombre_clasificacion,
-    AVG(DATEDIFF(i.fecha_registro_incidente, r.fecha_reporte)) AS dias_promedio_diferencia,
-    MIN(DATEDIFF(i.fecha_registro_incidente, r.fecha_reporte)) AS min_dias,
-    MAX(DATEDIFF(i.fecha_registro_incidente, r.fecha_reporte)) AS max_dias,
+    AVG(i.fecha_registro_incidente - r.fecha_reporte) AS dias_promedio_diferencia,
+    MIN(i.fecha_registro_incidente - r.fecha_reporte) AS min_dias,
+    MAX(i.fecha_registro_incidente - r.fecha_reporte) AS max_dias,
     COUNT(*) AS total_casos
 FROM incidente i
 INNER JOIN reporte r ON i.id_incidente = r.id_incidente
@@ -192,17 +193,17 @@ LIMIT 100;
 
 -- 14. Densidad de incidentes por coordenadas (clustering básico)
 SELECT 
-    ROUND(u.latitud, 2) AS latitud_aprox,
-    ROUND(u.longitud, 2) AS longitud_aprox,
+    ROUND(u.latitud::numeric, 2) AS latitud_aprox,
+    ROUND(u.longitud::numeric, 2) AS longitud_aprox,
     COUNT(i.id_incidente) AS total_incidentes,
-    GROUP_CONCAT(DISTINCT c.nombre_clasificacion SEPARATOR ', ') AS tipos_incidentes
+    STRING_AGG(DISTINCT c.nombre_clasificacion, ', ') AS tipos_incidentes
 FROM incidente i
 INNER JOIN ubicacion u ON i.id_colonia = u.id_colonia
 INNER JOIN clasificacion c ON i.id_clasificacion = c.id_clasificacion
 WHERE u.latitud IS NOT NULL 
   AND u.longitud IS NOT NULL
 GROUP BY latitud_aprox, longitud_aprox
-HAVING total_incidentes > 5
+HAVING COUNT(i.id_incidente) > 5
 ORDER BY total_incidentes DESC
 LIMIT 50;
 
@@ -300,7 +301,7 @@ LIMIT 100;
 -- VISTAS ÚTILES (OPCIONAL)
 -- =====================================================
 
--- Vista materializada: incidentes completos
+-- Vista: incidentes completos
 CREATE OR REPLACE VIEW v_incidentes_completos AS
 SELECT 
     i.id_incidente,
@@ -319,7 +320,7 @@ FROM incidente i
 LEFT JOIN clasificacion c ON i.id_clasificacion = c.id_clasificacion
 LEFT JOIN ubicacion u ON i.id_colonia = u.id_colonia;
 
--- Vista materializada: reportes completos
+-- Vista: reportes completos
 CREATE OR REPLACE VIEW v_reportes_completos AS
 SELECT 
     r.id_reporte_pk,
@@ -371,9 +372,14 @@ NOTAS:
    - GROUP BY debe incluir todas las columnas no agregadas en SELECT
    - HAVING filtra después de la agregación, WHERE antes
 
-4. EXTENSIONES:
-   - Agregar índices full-text para búsquedas en campo 'reporte'
-   - Considerar índices espaciales para consultas geográficas complejas
-   - Implementar procedimientos almacenados para operaciones frecuentes
-*/
+4. FUNCIONES POSTGRESQL:
+   - TO_CHAR(fecha, 'YYYY-MM'): Formatear fechas
+   - EXTRACT(HOUR FROM hora): Extraer parte de fecha/hora
+   - STRING_AGG(texto, separador): Concatenar strings
+   - (fecha1 - fecha2): Diferencia de fechas en días
 
+5. EXTENSIONES:
+   - Agregar índices full-text para búsquedas en campo 'reporte'
+   - Considerar índices espaciales (PostGIS) para consultas geográficas complejas
+   - Implementar funciones almacenadas para operaciones frecuentes
+*/

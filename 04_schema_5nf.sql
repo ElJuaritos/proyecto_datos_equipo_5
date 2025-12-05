@@ -22,53 +22,59 @@ DROP TABLE IF EXISTS medio_recepcion;
 -- Catálogo de tipos/categorías de incidentes
 -- =====================================================
 CREATE TABLE clasificacion (
-    id_clasificacion INT AUTO_INCREMENT PRIMARY KEY,
+    id_clasificacion SERIAL PRIMARY KEY,
     nombre_clasificacion VARCHAR(100) NOT NULL UNIQUE,
     descripcion VARCHAR(255) NULL,
     activo BOOLEAN DEFAULT TRUE,
-    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    INDEX idx_nombre_clasificacion (nombre_clasificacion)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-COMMENT='Catálogo de clasificaciones de incidentes (Agua Potable, Drenaje, etc.)';
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_nombre_clasificacion ON clasificacion(nombre_clasificacion);
+
+COMMENT ON TABLE clasificacion IS 'Catálogo de clasificaciones de incidentes (Agua Potable, Drenaje, etc.)';
 
 -- =====================================================
 -- TABLA: MEDIO_RECEPCION
 -- Catálogo de canales por los que se reciben reportes
 -- =====================================================
 CREATE TABLE medio_recepcion (
-    id_medio_recepcion INT AUTO_INCREMENT PRIMARY KEY,
+    id_medio_recepcion SERIAL PRIMARY KEY,
     nombre_medio VARCHAR(100) NOT NULL UNIQUE,
     descripcion VARCHAR(255) NULL,
     activo BOOLEAN DEFAULT TRUE,
-    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    INDEX idx_nombre_medio (nombre_medio)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-COMMENT='Catálogo de medios de recepción (Call Center, App Móvil, Web, etc.)';
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_nombre_medio ON medio_recepcion(nombre_medio);
+
+COMMENT ON TABLE medio_recepcion IS 'Catálogo de medios de recepción (Call Center, App Móvil, Web, etc.)';
 
 -- =====================================================
 -- TABLA: UBICACION
 -- Datos geográficos y administrativos de colonias
 -- =====================================================
 CREATE TABLE ubicacion (
-    id_colonia INT AUTO_INCREMENT PRIMARY KEY,
+    id_colonia SERIAL PRIMARY KEY,
     colonia_catalogo VARCHAR(255) NOT NULL,
     alcaldia_catalogo VARCHAR(100) NOT NULL,
     longitud DECIMAL(11, 8) NULL,
     latitud DECIMAL(11, 8) NULL,
     activo BOOLEAN DEFAULT TRUE,
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE KEY uk_colonia (colonia_catalogo),
-    INDEX idx_alcaldia (alcaldia_catalogo),
-    INDEX idx_coordenadas (longitud, latitud)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-COMMENT='Catálogo de ubicaciones: colonias, alcaldías y coordenadas geográficas';
+    CONSTRAINT uk_colonia UNIQUE (colonia_catalogo)
+);
+
+CREATE INDEX idx_alcaldia ON ubicacion(alcaldia_catalogo);
+CREATE INDEX idx_coordenadas ON ubicacion(longitud, latitud);
+
+COMMENT ON TABLE ubicacion IS 'Catálogo de ubicaciones: colonias, alcaldías y coordenadas geográficas';
 
 -- =====================================================
 -- TABLA: INCIDENTE
 -- Información principal del incidente/evento reportado
 -- =====================================================
 CREATE TABLE incidente (
-    id_incidente INT AUTO_INCREMENT PRIMARY KEY,
+    id_incidente SERIAL PRIMARY KEY,
     folio_incidente VARCHAR(50) NOT NULL UNIQUE,
     fecha_registro_incidente DATE NOT NULL,
     reporte VARCHAR(500) NOT NULL,
@@ -76,7 +82,7 @@ CREATE TABLE incidente (
     id_colonia INT NULL,
     estado VARCHAR(50) DEFAULT 'Registrado',
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     
     -- Claves foráneas
     CONSTRAINT fk_incidente_clasificacion 
@@ -89,17 +95,32 @@ CREATE TABLE incidente (
         FOREIGN KEY (id_colonia) 
         REFERENCES ubicacion(id_colonia)
         ON DELETE SET NULL
-        ON UPDATE CASCADE,
-    
-    -- Índices para optimización de consultas
-    INDEX idx_folio (folio_incidente),
-    INDEX idx_fecha_registro (fecha_registro_incidente),
-    INDEX idx_clasificacion (id_clasificacion),
-    INDEX idx_ubicacion (id_colonia),
-    INDEX idx_estado (estado),
-    INDEX idx_fecha_creacion (fecha_creacion)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-COMMENT='Entidad principal de incidentes: fugas, falta de agua, drenaje obstruido, etc.';
+        ON UPDATE CASCADE
+);
+
+-- Índices para optimización de consultas
+CREATE INDEX idx_folio ON incidente(folio_incidente);
+CREATE INDEX idx_fecha_registro ON incidente(fecha_registro_incidente);
+CREATE INDEX idx_clasificacion ON incidente(id_clasificacion);
+CREATE INDEX idx_ubicacion ON incidente(id_colonia);
+CREATE INDEX idx_estado ON incidente(estado);
+CREATE INDEX idx_fecha_creacion ON incidente(fecha_creacion);
+
+COMMENT ON TABLE incidente IS 'Entidad principal de incidentes: fugas, falta de agua, drenaje obstruido, etc.';
+
+-- Trigger para actualizar fecha_actualizacion automáticamente
+CREATE OR REPLACE FUNCTION actualizar_fecha_modificacion()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.fecha_actualizacion = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_incidente_fecha_actualizacion
+BEFORE UPDATE ON incidente
+FOR EACH ROW
+EXECUTE FUNCTION actualizar_fecha_modificacion();
 
 -- =====================================================
 -- TABLA: REPORTE
@@ -107,7 +128,7 @@ COMMENT='Entidad principal de incidentes: fugas, falta de agua, drenaje obstruid
 -- Un incidente puede tener múltiples reportes asociados
 -- =====================================================
 CREATE TABLE reporte (
-    id_reporte_pk INT AUTO_INCREMENT PRIMARY KEY,
+    id_reporte_pk SERIAL PRIMARY KEY,
     id_reporte VARCHAR(50) NOT NULL UNIQUE,
     id_incidente INT NOT NULL,
     fecha_reporte DATE NOT NULL,
@@ -126,16 +147,17 @@ CREATE TABLE reporte (
         FOREIGN KEY (id_medio_recepcion) 
         REFERENCES medio_recepcion(id_medio_recepcion)
         ON DELETE RESTRICT
-        ON UPDATE CASCADE,
-    
-    -- Índices para optimización de consultas
-    INDEX idx_id_reporte (id_reporte),
-    INDEX idx_incidente (id_incidente),
-    INDEX idx_fecha_reporte (fecha_reporte),
-    INDEX idx_medio_recepcion (id_medio_recepcion),
-    INDEX idx_fecha_hora (fecha_reporte, hora_reporte)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-COMMENT='Registros de reportes/notificaciones asociados a incidentes (relación 1:N con INCIDENTE)';
+        ON UPDATE CASCADE
+);
+
+-- Índices para optimización de consultas
+CREATE INDEX idx_id_reporte ON reporte(id_reporte);
+CREATE INDEX idx_incidente ON reporte(id_incidente);
+CREATE INDEX idx_fecha_reporte ON reporte(fecha_reporte);
+CREATE INDEX idx_medio_recepcion ON reporte(id_medio_recepcion);
+CREATE INDEX idx_fecha_hora ON reporte(fecha_reporte, hora_reporte);
+
+COMMENT ON TABLE reporte IS 'Registros de reportes/notificaciones asociados a incidentes (relación 1:N con INCIDENTE)';
 
 -- =====================================================
 -- VERIFICACIÓN DE INTEGRIDAD REFERENCIAL
@@ -143,14 +165,23 @@ COMMENT='Registros de reportes/notificaciones asociados a incidentes (relación 
 
 -- Verificar que todas las tablas se crearon correctamente
 SELECT 
-    TABLE_NAME,
-    ENGINE,
-    TABLE_ROWS,
-    CREATE_TIME
-FROM information_schema.TABLES
-WHERE TABLE_SCHEMA = DATABASE()
-AND TABLE_NAME IN ('clasificacion', 'medio_recepcion', 'ubicacion', 'incidente', 'reporte')
-ORDER BY TABLE_NAME;
+    schemaname,
+    tablename,
+    tableowner
+FROM pg_tables
+WHERE schemaname = 'public'
+AND tablename IN ('clasificacion', 'medio_recepcion', 'ubicacion', 'incidente', 'reporte')
+ORDER BY tablename;
+
+-- Verificar índices creados
+SELECT 
+    tablename,
+    indexname,
+    indexdef
+FROM pg_indexes
+WHERE schemaname = 'public'
+AND tablename IN ('clasificacion', 'medio_recepcion', 'ubicacion', 'incidente', 'reporte')
+ORDER BY tablename, indexname;
 
 -- =====================================================
 -- COMENTARIOS SOBRE EL DISEÑO
