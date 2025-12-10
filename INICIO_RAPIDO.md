@@ -1,6 +1,4 @@
-# 🚀 Guía de Inicio Rápido
-
-## ⚡ 5 Minutos para Empezar
+# Guía de Inicio Rápido
 
 ### Requisitos Previos
 - MySQL 8.0+ instalado y corriendo
@@ -8,7 +6,7 @@
 
 ---
 
-## 📊 Opción 1: Solo Base de Datos (2 comandos)
+## Opción 1: Solo Base de Datos (2 comandos)
 
 ```bash
 # 1. Crear el schema 5NF
@@ -18,7 +16,7 @@ mysql -u root -p reportes_agua_cdmx < 04_schema_5nf.sql
 # 2. Cargar los datos (demora ~2-5 minutos con 300K registros)
 mysql -u root -p reportes_agua_cdmx < 05_migracion_a_5nf.sql
 
-# ✅ ¡Listo! Ahora puedes ejecutar consultas
+# ¡Listo! Ahora puedes ejecutar consultas
 ```
 
 ### Verificar que funcionó:
@@ -48,7 +46,7 @@ SELECT 'reporte', COUNT(*) FROM reporte;
 
 ---
 
-## 🔥 Opción 2: Base de Datos + API (5 minutos)
+## Opción 2: Base de Datos + API (5 minutos)
 
 ### Paso 1: Base de Datos (igual que arriba)
 
@@ -112,7 +110,7 @@ Abre tu navegador en: **http://localhost:8000/docs**
 
 ---
 
-## 🧪 Pruebas Rápidas
+## Pruebas Rápidas
 
 ### Desde el Navegador (Swagger UI)
 
@@ -162,7 +160,7 @@ print(response.json())
 
 ---
 
-## 📊 Consultas de Análisis Rápido
+##  Consultas de Análisis Rápido
 
 ```sql
 -- 1. Top 10 colonias con más incidentes
@@ -196,7 +194,7 @@ ORDER BY total_incidentes DESC;
 
 ---
 
-## 🐛 Solución de Problemas Comunes
+##  Solución de Problemas Comunes
 
 ### Error: "Access denied for user"
 **Solución:** Verifica tu contraseña de MySQL y edita el archivo `.env`
@@ -230,7 +228,7 @@ Si `05_migracion_a_5nf.sql` falla, usar MySQL Workbench:
 
 ---
 
-## 📚 Siguientes Pasos
+## Siguientes Pasos
 
 Una vez que todo funciona:
 
@@ -252,18 +250,18 @@ Una vez que todo funciona:
 
 ---
 
-## ✅ Checklist de Verificación
+##  Checklist de Verificación
 
-- [ ] MySQL está corriendo
-- [ ] Base de datos `reportes_agua_cdmx` creada
-- [ ] Schema 5NF ejecutado (5 tablas creadas)
-- [ ] Datos migrados (300K+ reportes cargados)
-- [ ] (Opcional) API iniciada en http://localhost:8000
-- [ ] (Opcional) Swagger UI accesible en /docs
+-  MySQL está corriendo
+-  Base de datos `reportes_agua_cdmx` creada
+-  Schema 5NF ejecutado (5 tablas creadas)
+-  Datos migrados (300K+ reportes cargados)
+-  (Opcional) API iniciada en http://localhost:8000
+-  (Opcional) Swagger UI accesible en /docs
 
 ---
 
-## 🎯 Tiempo Estimado por Tarea
+##  Tiempo Estimado por Tarea
 
 | Tarea | Tiempo |
 |-------|--------|
@@ -277,7 +275,7 @@ Una vez que todo funciona:
 
 ---
 
-## 📞 Ayuda
+##  Ayuda
 
 Si tienes problemas:
 
@@ -289,13 +287,13 @@ Si tienes problemas:
 
 ---
 
-**¡Listo para empezar!** 🚀
+**Listo para empezar**
 
 Ejecuta los comandos y en menos de 5 minutos tendrás:
-- ✅ Base de datos normalizada en 5NF
-- ✅ 300,000+ reportes cargados
-- ✅ API REST funcionando
-- ✅ Documentación interactiva en Swagger
+-  Base de datos normalizada en 5NF
+-  300,000+ reportes cargados
+-  API REST funcionando
+-  Documentación interactiva en Swagger
 
-**Siguiente:** Abre http://localhost:8000/docs y empieza a explorar 🎉
+**Siguiente:** Abre http://localhost:8000/docs y empiece a explorar 
 
