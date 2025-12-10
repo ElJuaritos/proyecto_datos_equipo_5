@@ -1,17 +1,16 @@
 # FastAPI y servidor
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
+fastapi==0.110.0
+uvicorn[standard]==0.27.0
 python-multipart==0.0.6
 
 # Base de datos
-psycopg2-binary==2.9.11
-sqlalchemy==2.0.23
-cryptography==41.0.7
+psycopg2-binary==2.9.9
+sqlalchemy==2.0.25
 
 # Validación y serialización
-pydantic==2.5.0
-pydantic-settings==2.1.0
-email-validator==2.1.0
+pydantic==2.6.3
+pydantic-settings==2.2.1
+email-validator==2.1.1
 
 # CORS y seguridad
 python-jose[cryptography]==3.3.0
@@ -19,5 +18,5 @@ passlib[bcrypt]==1.7.4
 python-dotenv==1.0.0
 
 # Utilidades
-typing-extensions==4.8.0
+typing-extensions==4.11.0
 

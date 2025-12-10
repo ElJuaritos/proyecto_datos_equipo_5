@@ -53,4 +53,3 @@ CREATE TABLE reportes AS TABLE agua_cdmx.reportes;
 
 -- Paso 10: Confirmar
 SELECT COUNT(*) FROM reportes;
-
