@@ -5,7 +5,7 @@
 - Emilio Juarez Avalos
 - Juan Pablo Medina Esquivel
 
-**Fecha de entrega:** 29 de septiembre del 2025
+**Fecha de entrega:** 20 de diciembre del 2025
 
 ---
 
