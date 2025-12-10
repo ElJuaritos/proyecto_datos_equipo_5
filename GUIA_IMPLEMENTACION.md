@@ -4,7 +4,7 @@ Esta guía proporciona instrucciones paso a paso para implementar el sistema de 
 
 ---
 
-## 📋 Requisitos Previos
+## Requisitos Previos
 
 - MySQL 8.0+ o MariaDB 10.5+
 - Acceso a línea de comandos o MySQL Workbench
@@ -13,7 +13,7 @@ Esta guía proporciona instrucciones paso a paso para implementar el sistema de 
 
 ---
 
-## 🚀 Método 1: Implementación Completa con MySQL
+## Método 1: Implementación Completa con MySQL
 
 ### Paso 1: Crear la Base de Datos
 
@@ -138,11 +138,11 @@ mysql -u root -p reportes_agua_cdmx < 05_migracion_a_5nf.sql
 ```
 
 **Este script ejecuta automáticamente:**
-1. ✅ Extrae y carga catálogos únicos (CLASIFICACION, MEDIO_RECEPCION)
-2. ✅ Normaliza ubicaciones con validación de coordenadas
-3. ✅ Carga incidentes con relaciones FK
-4. ✅ Carga reportes con integridad referencial
-5. ✅ Genera estadísticas de validación
+1. Extrae y carga catálogos únicos (CLASIFICACION, MEDIO_RECEPCION)
+2. Normaliza ubicaciones con validación de coordenadas
+3. Carga incidentes con relaciones FK
+4. Carga reportes con integridad referencial
+5. Genera estadísticas de validación
 
 **Verificar resultados:**
 
@@ -174,7 +174,7 @@ mysql -u root -p reportes_agua_cdmx < 06_consultas_ejemplo_5nf.sql
 
 ---
 
-## 🐍 Método 2: Implementación con Python
+## Método 2: Implementación con Python
 
 ### Requisitos
 
@@ -221,7 +221,7 @@ df.to_sql(
     method='multi'
 )
 
-print("✅ Carga completada!")
+print(" Carga completada!")
 print("Ejecutar ahora: mysql -u root -p reportes_agua_cdmx < 05_migracion_a_5nf.sql")
 ```
 
@@ -233,7 +233,7 @@ python cargar_datos.py
 
 ---
 
-## 📊 Verificación de Integridad
+## Verificación de Integridad
 
 ### Consultas de Validación
 
@@ -387,7 +387,7 @@ ORDER BY (DATA_LENGTH + INDEX_LENGTH) DESC;
 
 ---
 
-## 🧹 Limpieza (Opcional)
+## Limpieza (Opcional)
 
 ### Eliminar Tabla Temporal
 
@@ -404,20 +404,20 @@ CREATE DATABASE reportes_agua_cdmx CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode
 
 ---
 
-## ✅ Checklist de Implementación
+## Puntos de Implementación
 
-- [ ] Base de datos creada con encoding correcto
-- [ ] Schema 5NF ejecutado sin errores
-- [ ] CSV cargado a tabla temporal
-- [ ] Migración a 5NF completada
-- [ ] Verificación de conteos realizada
-- [ ] Integridad referencial validada
-- [ ] Consultas de ejemplo probadas
-- [ ] Tabla temporal eliminada (opcional)
+-  Base de datos creada con encoding correcto
+-  Schema 5NF ejecutado sin errores
+-  CSV cargado a tabla temporal
+-  Migración a 5NF completada
+-  Verificación de conteos realizada
+-  Integridad referencial validada
+-  Consultas de ejemplo probadas
+-  Tabla temporal eliminada (opcional)
 
 ---
 
-## 📚 Recursos Adicionales
+##  Recursos Adicionales
 
 - **Documentación MySQL:** https://dev.mysql.com/doc/
 - **Teoría de Normalización:** https://en.wikipedia.org/wiki/Database_normalization
@@ -425,17 +425,17 @@ CREATE DATABASE reportes_agua_cdmx CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode
 
 ---
 
-## 🆘 Soporte
+## Soporte
 
-Si encuentras problemas durante la implementación:
+Si encuentra problemas durante la implementación:
 
-1. Revisa los logs de MySQL: `/var/log/mysql/error.log` (Linux) o Event Viewer (Windows)
-2. Verifica permisos de usuario en MySQL
-3. Asegúrate de tener espacio en disco suficiente (al menos 1GB libre)
-4. Consulta el archivo `diagrama_er_5nf.md` para entender las relaciones
+1. Revise los logs de MySQL: `/var/log/mysql/error.log` (Linux) o Event Viewer (Windows)
+2. Verifique permisos de usuario en MySQL
+3. Asegúrese de tener espacio en disco suficiente (al menos 1GB libre)
+4. Consulte el archivo `diagrama_er_5nf.md` para entender las relaciones
 
 ---
 
-**Última actualización:** Diciembre 2025  
+**Última actualización:** 09 Diciembre 2025  
 **Versión del Schema:** 1.0 (5NF)
 

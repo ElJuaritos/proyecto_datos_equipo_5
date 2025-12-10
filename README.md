@@ -5,7 +5,7 @@
 - Emilio Juarez Avalos
 - Juan Pablo Medina Esquivel
 
-**Fecha de entrega:** 29 de septiembre del 2025
+**Fecha de entrega:** 20 de diciembre del 2025
 
 ---
 
@@ -284,16 +284,16 @@ El proyecto incluye los siguientes archivos SQL organizados para facilitar la im
 
 ### Archivos Principales
 
-#### 📄 `01_carga_inicial.sql`
+####  `01_carga_inicial.sql`
 Script inicial para la carga de datos desde el archivo CSV original.
 
-#### 📄 `02_analisis_exploratorio.sql`
+####  `02_analisis_exploratorio.sql`
 Consultas SQL para análisis exploratorio de datos, estadísticas descriptivas y detección de patrones en los reportes de agua.
 
-#### 📄 `03_limpieza_datos.sql`
+####  `03_limpieza_datos.sql`
 Procesos de limpieza y transformación de datos: eliminación de duplicados, normalización de valores, corrección de inconsistencias.
 
-#### 📄 `04_schema_5nf.sql` ⭐
+####  `04_schema_5nf.sql` 
 **Schema de base de datos normalizado hasta 5NF**
 
 Define la estructura completa de las 5 tablas normalizadas:
@@ -309,7 +309,7 @@ Incluye:
 - Constraints de integridad referencial
 - Comentarios detallados sobre el diseño
 
-#### 📄 `05_migracion_a_5nf.sql` ⭐
+####  `05_migracion_a_5nf.sql` ⭐
 **Script de migración y carga de datos a 5NF**
 
 Transforma los datos del CSV original a las tablas normalizadas mediante:
@@ -326,7 +326,7 @@ Características:
 - Conversión de formatos de fecha y hora
 - Reportes de calidad de datos y verificación de integridad
 
-#### 📄 `06_consultas_ejemplo_5nf.sql` ⭐
+####  `06_consultas_ejemplo_5nf.sql` ⭐
 **Consultas de ejemplo y análisis**
 
 Colección de consultas SQL organizadas por categoría:
@@ -355,7 +355,7 @@ Colección de consultas SQL organizadas por categoría:
 - `v_incidentes_completos`
 - `v_reportes_completos`
 
-### 🚀 Orden de Ejecución Recomendado
+###  Orden de Ejecución Recomendado
 
 Para implementar el sistema completo desde cero:
 
@@ -372,7 +372,7 @@ mysql -u usuario -p nombre_bd < 06_consultas_ejemplo_5nf.sql
 
 📖 **Para instrucciones detalladas paso a paso, incluyendo solución de problemas y métodos alternativos de carga, consultar:** [`GUIA_IMPLEMENTACION.md`](GUIA_IMPLEMENTACION.md)
 
-### 📊 Beneficios del Diseño en 5NF
+###  Beneficios del Diseño en 5NF
 
 1. **Eliminación de redundancia**: Los catálogos se mantienen una sola vez
 2. **Integridad referencial**: Las FK garantizan consistencia de datos
@@ -381,7 +381,7 @@ mysql -u usuario -p nombre_bd < 06_consultas_ejemplo_5nf.sql
 5. **Performance optimizado**: Índices estratégicos en joins frecuentes
 6. **Sin anomalías**: No hay problemas de inserción, actualización o eliminación
 
-### 🔍 Verificación del Diseño
+###  Verificación del Diseño
 
 El diseño puede verificarse reconstruyendo la tabla original mediante un JOIN completo de las 5 tablas, demostrando que la descomposición es **sin pérdida de información** (lossless decomposition), requisito fundamental de la normalización hasta 5NF.
 

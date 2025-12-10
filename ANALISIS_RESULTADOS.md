@@ -25,14 +25,14 @@ Analizar el comportamiento de los reportes de agua en la Ciudad de México para 
 
 ### Interpretación
 
-**🔴 Hallazgo Crítico:** Iztapalapa concentra el mayor número de incidentes, con San Miguel Teotongo representando el 8.5% de todos los reportes de esa alcaldía. Esto sugiere problemas estructurales de infraestructura hídrica en la zona oriente de la ciudad.
+**Hallazgo:** Iztapalapa concentra el mayor número de incidentes, con San Miguel Teotongo representando el 8.5% de todos los reportes de esa alcaldía. Esto sugiere problemas estructurales de infraestructura hídrica en la zona oriente de la ciudad.
 
-**📊 Patrón Identificado:** Las colonias que lideran el ranking general suelen ser:
+**Patrón Identificado:** Las colonias que lideran el ranking general suelen ser:
 - Zonas densamente pobladas
 - Áreas con infraestructura antigua (más de 40 años)
 - Colonias en la periferia de la ciudad
 
-**💡 Recomendación:** Priorizar inversión en mantenimiento preventivo en las top 20 colonias, que concentran el 35% de todos los incidentes reportados.
+**Recomendación:** Priorizar inversión en mantenimiento preventivo en las top 20 colonias, que concentran el 35% de todos los incidentes reportados.
 
 ---
 
@@ -57,32 +57,18 @@ Analizar el comportamiento de los reportes de agua en la Ciudad de México para 
 
 ### Gráfica de Tendencia
 
-```
-Reportes por Mes (2022)
-35,000 |                    ●
-       |                   /|\
-30,000 |                  / | \
-       |                 /  |  \
-25,000 |                /   |   \
-       |         ●     /    |    \
-20,000 |    ●   / \   /     |     ●
-       |   / \ /   \ /      |      \
-15,000 |  /   ●     ●       |       \
-       | /                  |
-10,000 +---+---+---+---+---+---+---+---+---+---+---+---
-       ENE FEB MAR ABR MAY JUN JUL AGO SEP OCT NOV DIC
-```
+<img width="1024" height="687" alt="image" src="https://github.com/user-attachments/assets/42dab931-922e-4ac5-ba79-923c21c8f5f1" />
 
 ### Interpretación
 
-**📈 Tendencia Estacional:** Se observa un incremento significativo de reportes en **primavera-verano** (marzo-mayo), con un pico en mayo (+41.2% respecto a marzo). Esto coincide con:
+**Tendencia Estacional:** Se observa un incremento significativo de reportes en **primavera-verano** (marzo-mayo), con un pico en mayo (+41.2% respecto a marzo). Esto coincide con:
 - Temporada de estiaje (menor disponibilidad de agua)
 - Mayor consumo por temperaturas altas
 - Época de lluvias que expone fallas en drenaje
 
-**⚠️ Alerta:** El incremento del 41.2% entre febrero y marzo sugiere una crisis puntual que requiere investigación. Posible correlación con cortes de agua programados o fallas masivas.
+**Hallazgo:** El incremento del 41.2% entre febrero y marzo sugiere una crisis puntual que requiere investigación. Posible correlación con cortes de agua programados o fallas masivas.
 
-**💡 Recomendación:** Implementar plan de contingencia preventivo para marzo-mayo, con brigadas adicionales y comunicación proactiva a ciudadanos.
+**Recomendación:** Implementar plan de contingencia preventivo para marzo-mayo, con brigadas adicionales y comunicación proactiva a ciudadanos.
 
 ---
 
@@ -115,14 +101,14 @@ Reportes por Mes (2022)
 
 ### Interpretación
 
-**✅ Aspecto Positivo:** El 50% de los reportes se atienden en 2 días o menos, lo cual es un indicador aceptable de respuesta del sistema SACMEX.
+**Datos Positivos:** El 50% de los reportes se atienden en 2 días o menos, lo cual es un indicador aceptable de respuesta del sistema SACMEX.
 
-**❌ Área de Mejora:** El cuartil superior (Q4) muestra tiempos de atención inaceptables, con casos que llegan hasta 287 días. Estos casos representan:
+**Área de Mejora:** El cuartil superior (Q4) muestra tiempos de atención inaceptables, con casos que llegan hasta 287 días. Estos casos representan:
 - Incidentes de alta complejidad sin recursos asignados
 - Problemas burocráticos o falta de seguimiento
 - Posible abandono de reportes
 
-**🎯 Meta Recomendada:** Reducir el percentil 90 de 7 a 3 días mediante:
+**Meta Recomendada:** Reducir el percentil 90 de 7 a 3 días mediante:
 - Sistema de escalación automática para reportes > 5 días
 - Asignación prioritaria de recursos a colonias en Q4
 - Seguimiento proactivo con ciudadanos
@@ -161,12 +147,12 @@ Score = (Total Incidentes × 0.4) + (Total Reportes × 0.3) + (Promedio Reportes
 
 ### Hallazgos Clave
 
-**🔍 Descubrimiento:** Colonias con alto ratio reportes/incidente (>2.5) indican:
+**Descubrimiento:** Colonias con alto ratio reportes/incidente (>2.5) indican:
 1. **Ciudadanos más activos** en exigir soluciones
 2. **Problemas no resueltos** que generan múltiples llamadas
 3. **Falta de comunicación** sobre estatus de atención
 
-**🎯 Estrategia Diferenciada:**
+**Estrategia Diferenciada:**
 - **Score > 1,000 (Crítica):** Intervención inmediata con plan de obra mayor
 - **Score 500-1,000 (Alta):** Mantenimiento preventivo trimestral
 - **Score 200-500 (Media):** Monitoreo continuo y atención reactiva
@@ -205,17 +191,17 @@ Score = (Total Incidentes × 0.4) + (Total Reportes × 0.3) + (Promedio Reportes
 
 ### Interpretación
 
-**📞 Patrón de Llamadas:** La concentración de reportes entre 12:00-18:00 hrs (35%) sugiere que los ciudadanos reportan principalmente:
+**Patrón de Llamadas:** La concentración de reportes entre 12:00-18:00 hrs (35%) sugiere que los ciudadanos reportan principalmente:
 - Durante pausas de trabajo (hora de comida)
 - Al detectar problemas al regresar a casa
 - Cuando tienen tiempo libre para llamar
 
-**💡 Optimización de Recursos:**
+**Optimización de Recursos:**
 - **Call Center:** Reforzar personal 12:00-18:00 hrs (35% de la demanda)
 - **Brigadas:** Programar turnos 06:00-18:00 hrs (61% de reportes)
 - **Fines de Semana:** Mantener 40% del personal (vs 50% actual = ahorro)
 
-**🌙 Madrugada (00:00-06:00):** Solo 9% de reportes, pero probablemente son **urgencias reales** (inundaciones, fugas mayores). Priorizar estos casos para atención inmediata.
+**Madrugada (00:00-06:00):** Solo 9% de reportes, pero probablemente son **urgencias reales** (inundaciones, fugas mayores). Priorizar estos casos para atención inmediata.
 
 ---
 
@@ -239,7 +225,7 @@ Score = (Total Incidentes × 0.4) + (Total Reportes × 0.3) + (Promedio Reportes
 
 ### Interpretación
 
-**🚨 Alerta Crítica:** Colonias con reincidencia "Muy Alta" (>10 veces al año) indican:
+**Dato Crítico:** Colonias con reincidencia "Muy Alta" (>10 veces al año) indican:
 
 1. **Problemas estructurales no resueltos:** Las "soluciones" son parches temporales
 2. **Falta de mantenimiento preventivo:** Se atiende el síntoma, no la causa
@@ -259,7 +245,7 @@ Score = (Total Incidentes × 0.4) + (Total Reportes × 0.3) + (Promedio Reportes
 - **Impacto social:** ~15,000 personas afectadas repetidamente
 - **Pipas enviadas:** ~200 envíos (alto costo operativo)
 
-**💰 Análisis Costo-Beneficio:**
+**Análisis Costo-Beneficio:**
 ```
 Solución Reactiva (status quo):
 - 89 atenciones × $5,000 MXN = $445,000 MXN/año
@@ -270,7 +256,7 @@ Solución Preventiva (reemplazo):
 - Ahorro neto: $165,000 MXN + beneficios intangibles
 ```
 
-**🎯 Recomendación:** Priorizar reemplazo de infraestructura en las 20 ubicaciones con mayor reincidencia. ROI estimado: 18 meses.
+**Recomendación:** Priorizar reemplazo de infraestructura en las 20 ubicaciones con mayor reincidencia. ROI estimado: 18 meses.
 
 ---
 
@@ -308,18 +294,18 @@ Solución Preventiva (reemplazo):
 
 ### Interpretación
 
-**🗺️ Patrón Espacial Identificado:**
+**Patrón Espacial Identificado:**
 
 1. **Concentración Oriente:** Los clusters críticos se concentran en Iztapalapa y Gustavo A. Madero (zona oriente/norte)
 2. **Densidad Alta:** Las zonas críticas tienen >190 incidentes por colonia (vs. promedio de 75)
 3. **Contigüidad:** Los clusters críticos son geográficamente contiguos, sugiriendo problemas regionales
 
-**🔍 Análisis Causa-Raíz:**
+**Análisis Causa-Raíz:**
 - **Factor 1 - Infraestructura antigua:** Zona oriente tiene la red más antigua (>50 años)
 - **Factor 2 - Alta densidad poblacional:** Mayor demanda estresa el sistema
 - **Factor 3 - Presión hidráulica:** Zona alta topográficamente, menor presión natural
 
-**🎯 Estrategia de Intervención por Zonas:**
+**Estrategia de Intervención por Zonas:**
 
 **Cluster C1-C2 (Críticos):**
 - Proyecto de modernización integral de red
@@ -365,14 +351,14 @@ Ventanilla █ 0.4%
 
 ### Interpretación
 
-**📞 Dominio del Call Center:** El 91.6% de los reportes llegan vía telefónica, confirmando que sigue siendo el canal preferido por los ciudadanos. Sin embargo, esto crea un cuello de botella operativo.
+**Dominio del Call Center:** El 91.6% de los reportes llegan vía telefónica, confirmando que sigue siendo el canal preferido por los ciudadanos. Sin embargo, esto crea un cuello de botella operativo.
 
-**📱 Oportunidad Digital:** La App Móvil tiene el mejor tiempo de atención (1.7 días) pero solo representa 1.8% de reportes. Esto sugiere:
+**Oportunidad Digital:** La App Móvil tiene el mejor tiempo de atención (1.7 días) pero solo representa 1.8% de reportes. Esto sugiere:
 - Proceso más directo y estructurado
 - Información más completa al momento del reporte
 - Geolocalización automática
 
-**💡 Recomendaciones:**
+**Recomendaciones:**
 
 1. **Promoción de App Móvil:**
    - Campaña de difusión masiva
@@ -424,25 +410,25 @@ Donde cada componente pondera:
 
 ### Interpretación por Alcaldía
 
-**🥇 Iztapalapa (Score: 95.3) - PRIORIDAD MÁXIMA**
+**Iztapalapa (Score: 95.3) - PRIORIDAD MÁXIMA**
 - **Situación:** Concentra el mayor número absoluto de incidentes (45,678) y la mayor densidad (195 por colonia)
 - **Reto:** Infraestructura obsoleta en zona de alta marginación
 - **Inversión requerida:** $150M MXN en 3 años
 - **Estrategia:** Proyecto integral de renovación por sectores
 
-**🥈 Gustavo A. Madero (Score: 88.7) - PRIORIDAD ALTA**
+**Gustavo A. Madero (Score: 88.7) - PRIORIDAD ALTA**
 - **Situación:** Segundo lugar en volumen (38,234) con buena eficiencia de atención (2.4 días)
 - **Fortaleza:** Mejor organización operativa
 - **Área de mejora:** Prevención en lugar de reacción
 - **Estrategia:** Mantenimiento preventivo intensivo
 
-**🥉 Álvaro Obregón (Score: 79.4) - PRIORIDAD ALTA**
+**Álvaro Obregón (Score: 79.4) - PRIORIDAD ALTA**
 - **Situación:** Tercero en volumen pero primero en densidad relativa (197)
 - **Reto:** Colonias pequeñas con problemas severos
 - **Particularidad:** Santa Fe (zona de gran desarrollo) coexiste con colonias populares
 - **Estrategia:** Enfoque diferenciado por zona
 
-**📊 Alcaldías de Menor Prioridad (Score < 50):**
+**Alcaldías de Menor Prioridad (Score < 50):**
 - Milpa Alta, Cuajimalpa, Magdalena Contreras
 - Menor densidad poblacional
 - Problemas puntuales, no sistemáticos
@@ -450,22 +436,8 @@ Donde cada componente pondera:
 
 ### Matriz de Priorización
 
-```
-              Alto Volumen
-                   │
-      Q2           │          Q1
-   Mejorar      ───┼───    PRIORIDAD
-   Eficiencia      │         MÁXIMA
-                   │     (Iztapalapa,
-                   │      G.A. Madero)
-───────────────────┼───────────────────
-                   │
-      Q3           │          Q4
-   Mantenimiento───┼───   Optimizar
-     Regular       │       Recursos
-                   │
-              Bajo Volumen
-```
+<img width="863" height="1024" alt="image" src="https://github.com/user-attachments/assets/a680a9a7-1e8e-4d91-8ec1-ae4624e5dc3a" />
+
 
 ---
 
@@ -488,7 +460,7 @@ Donde cada componente pondera:
 
 ### Análisis de Estacionalidad
 
-**🌡️ Patrón Estacional Confirmado:**
+**Patrón Estacional Confirmado:**
 
 **Q1 (Ene-Mar) - Temporada Baja:**
 - 53,690 reportes (mínimo anual)
@@ -496,7 +468,7 @@ Donde cada componente pondera:
 - Ideal para mantenimiento preventivo programado
 
 **Q2 (Abr-Jun) - TEMPORADA CRÍTICA:**
-- 71,457 reportes (+33.1% vs Q1) ⚠️
+- 71,457 reportes (+33.1% vs Q1) ️
 - Estiaje + temperaturas altas
 - Mayor demanda doméstica e industrial
 - Fallas de bombeo por sobrecarga
@@ -514,7 +486,7 @@ Donde cada componente pondera:
 
 ### Interpretación y Recomendaciones
 
-**🎯 Estrategia Estacional:**
+**Estrategia Estacional:**
 
 **Enero-Marzo (Preparación):**
 - Mantenimiento preventivo intensivo
@@ -546,44 +518,44 @@ Donde cada componente pondera:
 
 ### Hallazgos Principales
 
-1. **📍 Concentración Geográfica:** El 40% de los incidentes se concentra en el 15% de las colonias (zona oriente principalmente)
+1. **Concentración Geográfica:** El 40% de los incidentes se concentra en el 15% de las colonias (zona oriente principalmente)
 
-2. **⏰ Estacionalidad Clara:** Q2 (Abr-Jun) requiere 50% más recursos operativos que Q1
+2. **Estacionalidad Clara:** Q2 (Abr-Jun) requiere 50% más recursos operativos que Q1
 
-3. **🔄 Reincidencia Alta:** Top 100 ubicaciones con problemas recurrentes representan 60% del trabajo reactivo
+3. **Reincidencia Alta:** Top 100 ubicaciones con problemas recurrentes representan 60% del trabajo reactivo
 
-4. **📱 Brecha Digital:** Solo 2% de reportes via digital, perdiendo eficiencia potencial
+4. **Brecha Digital:** Solo 2% de reportes via digital, perdiendo eficiencia potencial
 
-5. **⚡ Tiempo de Respuesta:** 50% atendidos en ≤2 días (bueno), pero 25% en >5 días (mejorable)
+5. **Tiempo de Respuesta:** 50% atendidos en ≤2 días (bueno), pero 25% en >5 días (mejorable)
 
 ### Recomendaciones Estratégicas
 
 **Corto Plazo (0-6 meses):**
-- ✅ Implementar sistema de escalación automática para reportes >5 días
-- ✅ Campaña de adopción de App Móvil (meta: 15% de reportes)
-- ✅ Reforzar brigadas en Q2 (40% adicional)
+- Implementar sistema de escalación automática para reportes >5 días
+- Campaña de adopción de App Móvil (meta: 15% de reportes)
+- Reforzar brigadas en Q2 (40% adicional)
 
 **Mediano Plazo (6-18 meses):**
-- ✅ Reemplazar infraestructura en top 20 ubicaciones recurrentes
-- ✅ Sistema de monitoreo IoT en clusters críticos
-- ✅ Programa de mantenimiento preventivo por scoring
+- Reemplazar infraestructura en top 20 ubicaciones recurrentes
+- Sistema de monitoreo IoT en clusters críticos
+- Programa de mantenimiento preventivo por scoring
 
 **Largo Plazo (18-36 meses):**
-- ✅ Modernización integral zona oriente ($150M MXN)
-- ✅ Sistema predictivo con ML para anticipar fallas
-- ✅ Plataforma unificada multi-canal con IA
+- Modernización integral zona oriente ($150M MXN)
+- Sistema predictivo con ML para anticipar fallas
+- Plataforma unificada multi-canal con IA
 
 ### Impacto Esperado
 
-**Con implementación completa:**
-- 📉 Reducción 35% en incidentes recurrentes
-- ⚡ Tiempo promedio de atención: 2.3 → 1.5 días
-- 💰 Ahorro operativo estimado: $25M MXN/año
-- 😊 Satisfacción ciudadana: +40 puntos NPS
+**Resultados esperados con la implementación total del proyecto:**
+- Reducción 35% en incidentes recurrentes
+- Tiempo promedio de atención: 2.3 → 1.5 días
+- Ahorro operativo estimado: $25M MXN/año
+- Satisfacción ciudadana: +40 puntos NPS
 
 ---
 
-**Documento generado:** Diciembre 2025  
+**Documento generado:**  09 Diciembre 2025  
 **Fuente de datos:** Reportes Agua CDMX 2022  
 **Consultas disponibles en:** `07_analisis_avanzado.sql`
 

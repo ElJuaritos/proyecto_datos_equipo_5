@@ -212,29 +212,29 @@ Este JOIN demuestra que todas las proyecciones pueden recombinarse sin pérdida 
 
 ## Normalización: 1NF → 2NF → 3NF → 4NF → 5NF
 
-### 1NF (Primera Forma Normal) ✅
+### 1NF (Primera Forma Normal) - COMPLETO
 - Todas las columnas son atómicas
 - No hay grupos repetitivos
 - Cada celda contiene un solo valor
 
-### 2NF (Segunda Forma Normal) ✅
+### 2NF (Segunda Forma Normal) - COMPLETO
 - Cumple 1NF
 - No hay dependencias parciales (no aplicable, no hay llave compuesta)
 
-### 3NF (Tercera Forma Normal) ✅
+### 3NF (Tercera Forma Normal) - COMPLETO
 - Cumple 2NF
 - Se eliminan dependencias transitivas:
   - `folio_incidente → colonia_catalogo → alcaldia_catalogo, longitud, latitud`
   - Solución: Crear tabla **UBICACION**
 
-### 4NF (Cuarta Forma Normal) ✅
+### 4NF (Cuarta Forma Normal) - COMPLETO
 - Cumple 3NF
 - Se eliminan dependencias multivaluadas (MVD):
   - `folio_incidente ↠ id_reporte`
   - Un incidente puede tener múltiples reportes independientes
   - Solución: Separar **INCIDENTE** y **REPORTE**
 
-### 5NF (Quinta Forma Normal) ✅
+### 5NF (Quinta Forma Normal) - COMPLETO
 - Cumple 4NF
 - Se eliminan dependencias de join (JD):
   - Catálogos repetitivos extraídos en tablas independientes
@@ -292,11 +292,11 @@ ORDER BY COUNT(i.id_incidente) DESC;
 ## Conclusión
 
 El diseño en **5NF** garantiza:
-1. ✅ **Máxima normalización** sin pérdida de información
-2. ✅ **Integridad total** mediante constraints FK
-3. ✅ **Performance optimizado** con índices estratégicos
-4. ✅ **Mantenimiento simple** de catálogos centralizados
-5. ✅ **Escalabilidad** para crecimiento futuro
+1.  **Máxima normalización** sin pérdida de información
+2.  **Integridad total** mediante constraints FK
+3.  **Performance optimizado** con índices estratégicos
+4.  **Mantenimiento simple** de catálogos centralizados
+5.  **Escalabilidad** para crecimiento futuro
 
 Este modelo es apropiado para sistemas transaccionales (OLTP) donde la integridad y consistencia son prioritarias. Para sistemas analíticos (OLAP) de alto volumen, podría considerarse desnormalización controlada o tablas agregadas/materializadas.
 

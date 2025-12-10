@@ -1,12 +1,9 @@
-# 📮 Guía Completa de Pruebas con Postman
+# Guía de Pruebas con Postman
 
 ## Sistema de Reportes de Agua CDMX - API Testing
-
-Esta guía te ayudará a probar todos los endpoints del API usando Postman.
-
 ---
 
-## 🔧 Configuración Inicial de Postman
+## Configuración Inicial de Postman
 
 ### 1. Crear Variable de Entorno
 
@@ -15,13 +12,13 @@ En Postman, crea una variable de entorno:
 - **Variable:** `base_url`
 - **Valor:** `http://localhost:8000/api/v1`
 
-Así podrás usar `{{base_url}}` en todas tus peticiones.
+Así podrá usar `{{base_url}}` en todas sus peticiones.
 
 ---
 
-## 📂 ENDPOINTS Y EJEMPLOS
+## ENDPOINTS Y EJEMPLOS
 
-### ✅ 0. Health Check (Verificar que el API funciona)
+###  0. Health Check (Verificar que el API funciona)
 
 **GET** `http://localhost:8000/health`
 
@@ -114,7 +111,7 @@ Así podrás usar `{{base_url}}` en todas tus peticiones.
 
 ---
 
-## 📞 2. MEDIOS DE RECEPCIÓN
+## 2. MEDIOS DE RECEPCIÓN
 
 ### 2.1 Listar todos los medios
 
@@ -164,7 +161,7 @@ Así podrás usar `{{base_url}}` en todas tus peticiones.
 
 ---
 
-## 📍 3. UBICACIONES
+## 3. UBICACIONES
 
 ### 3.1 Listar todas las ubicaciones
 
@@ -232,7 +229,7 @@ Así podrás usar `{{base_url}}` en todas tus peticiones.
 
 ---
 
-## 🚨 4. INCIDENTES
+## 4. INCIDENTES
 
 ### 4.1 Listar todos los incidentes
 
@@ -318,7 +315,7 @@ Este es muy útil para buscar un incidente específico por su folio único.
 
 **DELETE** `{{base_url}}/incidentes/100`
 
-**⚠️ Importante:** Al eliminar un incidente, también se eliminan todos sus reportes asociados (cascada).
+**Importante:** Al eliminar un incidente, también se eliminan todos sus reportes asociados (cascada).
 
 ---
 
@@ -400,9 +397,9 @@ Este es muy útil para buscar un incidente específico por su folio único.
 
 ---
 
-## 🧪 FLUJO DE PRUEBA COMPLETO
+## FLUJO DE PRUEBA COMPLETO
 
-Aquí tienes un flujo lógico para probar el sistema completo:
+Flujo lógico para probar el sistema completo:
 
 ### Paso 1: Verificar datos existentes
 1. `GET /clasificaciones/` - Ver clasificaciones disponibles
@@ -492,7 +489,7 @@ DELETE /ubicaciones/1500
 
 ---
 
-## 🔍 FILTROS Y BÚSQUEDAS ÚTILES
+## FILTROS Y BÚSQUEDAS ÚTILES
 
 ### Buscar incidentes de alta prioridad
 ```
@@ -517,7 +514,7 @@ GET /incidentes/folio/I-20220101-0001
 
 ---
 
-## 🚨 MANEJO DE ERRORES
+## MANEJO DE ERRORES
 
 ### Error 404 - No encontrado
 ```json
@@ -550,7 +547,7 @@ GET /incidentes/folio/I-20220101-0001
 
 ---
 
-## 📊 CÓDIGOS DE RESPUESTA HTTP
+## CÓDIGOS DE RESPUESTA HTTP
 
 - **200 OK**: Operación exitosa (GET, PUT, DELETE)
 - **201 Created**: Recurso creado exitosamente (POST)
@@ -561,7 +558,7 @@ GET /incidentes/folio/I-20220101-0001
 
 ---
 
-## 💡 TIPS PARA POSTMAN
+## TIPS PARA POSTMAN
 
 ### 1. Usar Variables
 Crea variables para:
@@ -606,30 +603,7 @@ Puedes importar automáticamente todos los endpoints:
 
 ---
 
-## 🎯 CASOS DE PRUEBA RECOMENDADOS
-
-### ✅ Casos Exitosos
-- [ ] Crear clasificación nueva
-- [ ] Crear medio de recepción nuevo
-- [ ] Crear ubicación con coordenadas válidas
-- [ ] Crear incidente con todas las FKs válidas
-- [ ] Crear múltiples reportes para un incidente
-- [ ] Actualizar estado de incidente
-- [ ] Buscar por folio único
-- [ ] Filtrar por alcaldía
-- [ ] Paginación con skip/limit
-
-### ❌ Casos de Error (deben fallar)
-- [ ] Crear incidente con folio duplicado
-- [ ] Crear ubicación con coordenadas fuera de rango
-- [ ] Crear reporte con incidente inexistente
-- [ ] Eliminar clasificación con incidentes asociados
-- [ ] Actualizar con datos inválidos
-- [ ] Buscar ID que no existe
-
----
-
-## 📞 RECURSOS ADICIONALES
+## RECURSOS ADICIONALES
 
 - **Swagger UI**: http://localhost:8000/docs
 - **ReDoc**: http://localhost:8000/redoc
@@ -639,9 +613,8 @@ Puedes importar automáticamente todos los endpoints:
 
 ---
 
-## 🏁 ¡LISTO PARA PROBAR!
+## LISTO PARA PROBAR
 
-Ahora tienes todo lo necesario para probar el API completamente con Postman. 
 
 **Orden recomendado:**
 1. Health check
