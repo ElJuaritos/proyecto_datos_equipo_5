@@ -3,6 +3,7 @@
 
 ---
 
+<<<<<<< HEAD
 ## Mejoras del Diseño 5NF
 
 1. **Nueva tabla ALCALDIA**: Elimina dependencia transitiva colonia→alcaldía
@@ -10,6 +11,15 @@
 3. **COLONIA refactorizada**: FK a ALCALDIA
 4. **INCIDENTE mejorado**: Coordenadas específicas del incidente
 5. **5NF alcanzada**: Sin dependencias transitivas
+=======
+
+### Mejoras Implementadas:
+1. **tabla ALCALDIA**: Elimina dependencia transitiva colonia→alcaldía
+2. **tabla ESTADO_INCIDENTE**: Valida estados con catálogo cerrado
+3. **COLONIA refactorizada**: Ahora con FK a ALCALDIA
+4. **INCIDENTE**: Coordenadas específicas del incidente
+5. **5NF**: Todas las dependencias transitivas eliminadas
+>>>>>>> 29a9e360279235a85da122ce8e84ab927cd27c51
 
 ---
 
@@ -98,7 +108,11 @@
 - **FK en**: `colonia.id_alcaldia`
 - **Constraint**: `ON DELETE RESTRICT`
 - **Ejemplo**: "Benito Juárez" → 300 colonias
+<<<<<<< HEAD
 - **Mejora**: Elimina redundancia, nombre almacenado una sola vez
+=======
+- Elimina redundancia de almacenar "Benito Juárez" N veces
+>>>>>>> 29a9e360279235a85da122ce8e84ab927cd27c51
 
 ### 3. COLONIA ──(1:N)── INCIDENTE
 - **Descripción**: Una colonia puede tener múltiples incidentes
@@ -106,7 +120,11 @@
 - **FK en**: `incidente.id_colonia`
 - **Constraint**: `ON DELETE SET NULL`
 - **Ejemplo**: "Del Valle Sur" → 500 incidentes
+<<<<<<< HEAD
 - **Mejora**: FK a alcaldía en lugar de almacenar nombre
+=======
+- Ya no almacena alcaldia_catalogo (ahora es FK)
+>>>>>>> 29a9e360279235a85da122ce8e84ab927cd27c51
 
 ### 4. ESTADO_INCIDENTE ──(1:N)── INCIDENTE
 - **Descripción**: Un estado puede aplicar a múltiples incidentes
@@ -114,7 +132,11 @@
 - **FK en**: `incidente.id_estado`
 - **Constraint**: `ON DELETE RESTRICT`
 - **Ejemplo**: "Registrado" → 180,000 incidentes
+<<<<<<< HEAD
 - **Mejora**: Valida estados, evita typos
+=======
+- Valida estados, evita typos y inconsistencias
+>>>>>>> 29a9e360279235a85da122ce8e84ab927cd27c51
 
 ### 5. INCIDENTE ──(1:N)── REPORTE
 - **Descripción**: Un incidente puede generar múltiples reportes
@@ -137,39 +159,60 @@
 ### CLASIFICACION
 ```
 id_clasificacion → nombre_clasificacion, descripcion, activo, fecha_creacion
-✅ Solo DF desde la PK
+Solo DF desde la PK
 ```
 
 ### MEDIO_RECEPCION
 ```
 id_medio_recepcion → nombre_medio, descripcion, activo, fecha_creacion
-✅ Solo DF desde la PK
+ Solo DF desde la PK
 ```
 
 ### ALCALDIA
 ```
 id_alcaldia → nombre_alcaldia, codigo_alcaldia, activo, fecha_creacion
 Solo DF desde la PK
+<<<<<<< HEAD
+=======
+Elimina repetición de nombres de alcaldía
+>>>>>>> 29a9e360279235a85da122ce8e84ab927cd27c51
 ```
 
 ### ESTADO_INCIDENTE
 ```
 id_estado → nombre_estado, descripcion, orden, activo, fecha_creacion
+<<<<<<< HEAD
 Solo DF desde la PK, dominio finito validado
+=======
+Solo DF desde la PK
+Dominio finito y validado
+>>>>>>> 29a9e360279235a85da122ce8e84ab927cd27c51
 ```
 
 ### COLONIA
 ```
 ANTES:
   id_colonia → colonia_catalogo, alcaldia_catalogo, longitud, latitud
+<<<<<<< HEAD
   colonia_catalogo → alcaldia_catalogo  [DEPENDENCIA TRANSITIVA]
+=======
+  colonia_catalogo → alcaldia_catalogo  
+>>>>>>> 29a9e360279235a85da122ce8e84ab927cd27c51
 
 DESPUÉS:
   id_colonia → nombre_colonia, id_alcaldia, codigo_postal, centroide_longitud, centroide_latitud
+<<<<<<< HEAD
   Solo DF desde la PK o FKs
 ```
 
 ### INCIDENTE
+=======
+   Solo DF desde la PK o FKs
+   alcaldia_catalogo eliminado (ahora es FK)
+```
+
+### INCIDENTE 
+>>>>>>> 29a9e360279235a85da122ce8e84ab927cd27c51
 ```
 id_incidente → folio_incidente, fecha_registro_incidente, reporte, 
                id_clasificacion, id_colonia, id_estado,
@@ -177,6 +220,7 @@ id_incidente → folio_incidente, fecha_registro_incidente, reporte,
                fecha_creacion, fecha_actualizacion
 
 folio_incidente → (todos los demás atributos)  // Clave alternativa
+<<<<<<< HEAD
 Solo DF desde la PK
 ```
 
@@ -185,6 +229,18 @@ Solo DF desde la PK
 id_reporte_pk → id_reporte, id_incidente, fecha_reporte, hora_reporte, id_medio_recepcion
 id_reporte → (todos los demás atributos)  // Clave alternativa
 Solo DF desde la PK
+=======
+
+ Solo DF desde la PK
+ Nuevos atributos: id_estado, longitud_incidente, latitud_incidente
+```
+
+### REPORTE 
+```
+id_reporte_pk → id_reporte, id_incidente, fecha_reporte, hora_reporte, id_medio_recepcion
+id_reporte → (todos los demás atributos)  // Clave alternativa
+ Solo DF desde la PK
+>>>>>>> 29a9e360279235a85da122ce8e84ab927cd27c51
 ```
 
 ---
@@ -201,24 +257,24 @@ Solo DF desde la PK
 - `UNIQUE INDEX (nombre_medio)`
 - `INDEX idx_nombre_medio (nombre_medio)`
 
-### ALCALDIA [NUEVA]
+### ALCALDIA
 - `PRIMARY KEY (id_alcaldia)`
 - `UNIQUE INDEX (nombre_alcaldia)`
 - `INDEX idx_nombre_alcaldia (nombre_alcaldia)`
 
-### ESTADO_INCIDENTE [NUEVA]
+### ESTADO_INCIDENTE 
 - `PRIMARY KEY (id_estado)`
 - `UNIQUE INDEX (nombre_estado)`
 - `INDEX idx_nombre_estado (nombre_estado)`
 
-### COLONIA [REFACTORIZADA]
+### COLONIA 
 - `PRIMARY KEY (id_colonia)`
 - `UNIQUE INDEX (nombre_colonia, id_alcaldia)` ← Clave alternativa compuesta
 - `INDEX idx_alcaldia_colonia (id_alcaldia)` ← Para JOIN con alcaldia
 - `INDEX idx_nombre_colonia (nombre_colonia)` ← Para búsquedas
 - `INDEX idx_coordenadas_colonia (centroide_longitud, centroide_latitud)` ← Para geo-queries
 
-### INCIDENTE [MEJORADO]
+### INCIDENTE 
 - `PRIMARY KEY (id_incidente)`
 - `UNIQUE INDEX (folio_incidente)`
 - `INDEX idx_clasificacion (id_clasificacion)` ← JOIN con clasificacion
@@ -228,7 +284,7 @@ Solo DF desde la PK
 - `INDEX idx_coordenadas_incidente (longitud_incidente, latitud_incidente)` ← Geo-queries [NUEVO]
 - `INDEX idx_fecha_creacion (fecha_creacion)`
 
-### REPORTE [SIN CAMBIOS]
+### REPORTE 
 - `PRIMARY KEY (id_reporte_pk)`
 - `UNIQUE INDEX (id_reporte)`
 - `INDEX idx_incidente (id_incidente)` ← JOIN con incidente
@@ -276,7 +332,7 @@ Solo DF desde la PK
 | 1 | Del Valle Sur | 3 | -99.17515038 | 19.36850264 |
 | 2 | Florida | 1 | -99.1799217 | 19.3607533 |
 
-**⭐ NOTA**: Antes se almacenaba "Benito Juárez" como texto en cada fila. Ahora solo se almacena el ID (3), eliminando redundancia.
+**NOTA**: Antes se almacenaba "Benito Juárez" como texto en cada fila. Ahora solo se almacena el ID (3), eliminando redundancia.
 
 ### INCIDENTE [MEJORADO]
 | id_incidente | folio_incidente | fecha_registro_incidente | id_clasificacion | id_colonia | id_estado | longitud_incidente | latitud_incidente |
@@ -284,7 +340,7 @@ Solo DF desde la PK
 | 1 | I-20220101-0001 | 2022-01-02 | 1 | 1 | 1 | -99.17520000 | 19.36855000 |
 | 2 | I-20220101-0002 | 2022-01-02 | 2 | 2 | 2 | -99.17995000 | 19.36080000 |
 
-**⭐ NOTAS**:
+** NOTAS**:
 - `id_estado` ahora es FK a estado_incidente (antes era VARCHAR)
 - `longitud_incidente` y `latitud_incidente` son las coordenadas exactas del punto del incidente
 - La colonia tiene `centroide_longitud/latitud` para el centro geográfico de la colonia
@@ -327,7 +383,7 @@ LEFT JOIN colonia col ON i.id_colonia = col.id_colonia
 LEFT JOIN alcaldia a ON col.id_alcaldia = a.id_alcaldia;             -- ← NUEVO JOIN
 ```
 
-**⭐ CAMBIOS EN EL JOIN**:
+**CAMBIOS EN EL JOIN**:
 - Se agregó `JOIN estado_incidente` para obtener el nombre del estado
 - Se agregó `JOIN alcaldia` para obtener el nombre de la alcaldía
 - Se renombraron las coordenadas para diferenciar centroide vs punto exacto
@@ -338,47 +394,47 @@ Este JOIN demuestra que todas las proyecciones pueden recombinarse sin pérdida 
 
 ## Normalización: 1NF → 2NF → 3NF → BCNF → 4NF → 5NF
 
-### 1NF (Primera Forma Normal) - COMPLETO ✅
+### 1NF (Primera Forma Normal) - COMPLETO 
 - Todas las columnas son atómicas
 - No hay grupos repetitivos
 - Cada celda contiene un solo valor
 
-### 2NF (Segunda Forma Normal) - COMPLETO ✅
+### 2NF (Segunda Forma Normal) - COMPLETO 
 - Cumple 1NF
 - No hay dependencias parciales (no aplicable en la mayoría de tablas, no hay llaves compuestas)
 - Excepción: COLONIA tiene clave alternativa compuesta (nombre_colonia, id_alcaldia), pero cumple 2NF
 
-### 3NF (Tercera Forma Normal) - COMPLETO ✅
+### 3NF (Tercera Forma Normal) - COMPLETO 
 - Cumple 2NF
 - Se eliminan dependencias transitivas:
-  - **ANTES**: `colonia → alcaldia_catalogo` (dependencia transitiva) ❌
-  - **AHORA**: `colonia → id_alcaldia → nombre_alcaldia` (FK válida) ✅
+  - **ANTES**: `colonia → alcaldia_catalogo` (dependencia transitiva) 
+  - **AHORA**: `colonia → id_alcaldia → nombre_alcaldia` (FK válida) 
   - Solución: Crear tabla **ALCALDIA**
 
-### BCNF (Forma Normal de Boyce-Codd) - COMPLETO ✅
+### BCNF (Forma Normal de Boyce-Codd) - COMPLETO 
 - Cumple 3NF
 - Todas las dependencias funcionales tienen una superclave a la izquierda
 - **VERIFICACIÓN**:
-  - ALCALDIA: `id_alcaldia → ...` ✅ (PK es superclave)
-  - COLONIA: `id_colonia → ...` y `(nombre_colonia, id_alcaldia) → ...` ✅ (ambas son superclaves)
+  - ALCALDIA: `id_alcaldia → ...` (PK es superclave)
+  - COLONIA: `id_colonia → ...` y `(nombre_colonia, id_alcaldia) → ...`  (ambas son superclaves)
   - Todas las tablas cumplen BCNF
 
-### 4NF (Cuarta Forma Normal) - COMPLETO ✅
+### 4NF (Cuarta Forma Normal) - COMPLETO 
 - Cumple BCNF
 - Se eliminan dependencias multivaluadas (MVD):
   - `folio_incidente ↠ id_reporte`
   - Un incidente puede tener múltiples reportes independientes
-  - Solución: Separar **INCIDENTE** y **REPORTE** ✅ (ya estaba en versión anterior)
+  - Solución: Separar **INCIDENTE** y **REPORTE** 
 
-### 5NF (Quinta Forma Normal) - **AHORA SÍ COMPLETO** ✅
+### 5NF (Quinta Forma Normal) - **AHORA SÍ COMPLETO** 
 - Cumple 4NF
 - Se eliminan dependencias de join (JD):
-  - **ANTES**: Valores repetitivos de alcaldía en tabla ubicacion ❌
-  - **AHORA**: Catálogo **ALCALDIA** independiente ✅
-  - **ANTES**: Estados como VARCHAR sin validación ❌
-  - **AHORA**: Catálogo **ESTADO_INCIDENTE** validado ✅
+  - **ANTES**: Valores repetitivos de alcaldía en tabla ubicacion 
+  - **AHORA**: Catálogo **ALCALDIA** independiente 
+  - **ANTES**: Estados como VARCHAR sin validación 
+  - **AHORA**: Catálogo **ESTADO_INCIDENTE** validado 
 - No existen proyecciones adicionales que puedan recombinarse sin pérdida
-- **VERDADERA 5NF ALCANZADA** 🎉
+- **5NF ALCANZADA** 
 
 ---
 
@@ -463,11 +519,11 @@ WHERE i.longitud_incidente IS NOT NULL;
 
 | Aspecto | Versión Anterior (5 tablas) | Versión Mejorada (7 tablas) |
 |---------|----------------------------|------------------------------|
-| **Normalización** | ⚠️ 4NF (con problemas de 3NF en ubicacion) | ✅ 5NF verdadera |
-| **Dependencias transitivas** | ❌ Presente en ubicacion | ✅ Eliminadas completamente |
-| **Validación de estados** | ❌ VARCHAR sin validar | ✅ FK a catálogo |
-| **Redundancia de alcaldías** | ❌ Alta (N repeticiones) | ✅ Cero (1 vez) |
-| **Granularidad geoespacial** | ⚠️ Solo centroide | ✅ Centroide + punto exacto |
+| **Normalización** |  4NF (con problemas de 3NF en ubicacion) | 5NF verdadera |
+| **Dependencias transitivas** |  Presente en ubicacion |  Eliminadas completamente |
+| **Validación de estados** |  VARCHAR sin validar |  FK a catálogo |
+| **Redundancia de alcaldías** |  Alta (N repeticiones) |  Cero (1 vez) |
+| **Granularidad geoespacial** |  Solo centroide |  Centroide + punto exacto |
 | **Tablas** | 5 | 7 |
 | **JOINs típicos** | 4-5 | 5-6 |
 | **Complejidad consultas** | Media | Media-Alta |
@@ -497,14 +553,14 @@ WHERE i.longitud_incidente IS NOT NULL;
 
 El diseño mejorado en **5NF verdadera** garantiza:
 
-1. ✅ **Máxima normalización** sin pérdida de información
-2. ✅ **Eliminación total** de dependencias transitivas
-3. ✅ **Integridad absoluta** mediante constraints FK en todas las relaciones
-4. ✅ **Validación de dominios** (estados, clasificaciones, medios, alcaldías)
-5. ✅ **Performance optimizado** con índices estratégicos en todos los JOINs
-6. ✅ **Mantenimiento centralizado** de catálogos
-7. ✅ **Escalabilidad** para crecimiento y nuevas funcionalidades
-8. ✅ **Granularidad geoespacial** mejorada (centroides + puntos exactos)
+1. **Máxima normalización** sin pérdida de información
+2.  **Eliminación total** de dependencias transitivas
+3.  **Integridad absoluta** mediante constraints FK en todas las relaciones
+4.  **Validación de dominios** (estados, clasificaciones, medios, alcaldías)
+5.  **Performance optimizado** con índices estratégicos en todos los JOINs
+6.  **Mantenimiento centralizado** de catálogos
+7.  **Escalabilidad** para crecimiento y nuevas funcionalidades
+8.  **Granularidad geoespacial** mejorada (centroides + puntos exactos)
 
 Este modelo es **óptimo para sistemas transaccionales (OLTP)** donde la integridad, consistencia y capacidad de actualización son prioritarias.
 
@@ -516,6 +572,6 @@ Para sistemas analíticos (OLAP) de alto volumen, se puede considerar:
 
 ---
 
-**Fecha de actualización**: Diciembre 2025  
+**Fecha de actualización**: 19 Diciembre 2025  
 **Versión**: 2.0 - 5NF Verdadera  
 **Cambios**: Agregadas tablas ALCALDIA y ESTADO_INCIDENTE, refactorizada COLONIA
