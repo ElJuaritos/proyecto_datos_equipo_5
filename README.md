@@ -164,9 +164,9 @@ Se realizaron las siguientes actividades de limpieza documentadas en el script `
 
 Todas las operaciones de limpieza fueron necesarias para preparar el dataset para análisis posteriores. Las conversiones de tipo de dato (fechas y coordenadas) permiten realizar cálculos y análisis que no serían posibles con datos en formato texto. La normalización de valores categóricos y la eliminación de duplicados mejoran la calidad y consistencia del dataset. El respaldo de los datos originales garantiza que siempre se puede volver al estado inicial si es necesario revisar o modificar el proceso de limpieza.
 
-## D) Normalización de datos hasta 5NF (VERSIÓN MEJORADA)
+## D) Normalización de datos hasta 5NF 
 
-### ⭐ Mejoras implementadas en la normalización:
+###  Mejoras implementadas en la normalización:
 1. **Nueva tabla ALCALDIA**: Elimina dependencia transitiva colonia→alcaldía
 2. **Nueva tabla ESTADO_INCIDENTE**: Valida estados con catálogo cerrado
 3. **COLONIA refactorizada**: Ahora con FK a ALCALDIA (antes UBICACION)
@@ -236,7 +236,7 @@ descripcion (opcional)
 activo
 fecha_creacion
 
-**3. Entidad ALCALDIA** ← **NUEVO**
+**3. Entidad ALCALDIA** ←
    columnas:
 id_alcaldia (PK)
 nombre_alcaldia (unique)
@@ -244,7 +244,7 @@ codigo_alcaldia (opcional)
 activo
 fecha_creacion
 
-**4. Entidad ESTADO_INCIDENTE** ← **NUEVO**
+**4. Entidad ESTADO_INCIDENTE** ← 
    columnas:
 id_estado (PK)
 nombre_estado (unique)
@@ -253,18 +253,18 @@ orden (para ordenar estados)
 activo
 fecha_creacion
 
-**5. Entidad COLONIA** (antes UBICACION) ← **REFACTORIZADA**
+**5. Entidad COLONIA** (antes UBICACION) ←
    columnas:
 id_colonia (PK)
 nombre_colonia
-id_alcaldia (FK → alcaldia) ← **Ahora es FK, no texto**
+id_alcaldia (FK → alcaldia) 
 codigo_postal (opcional)
 centroide_longitud ← **Centro de la colonia**
 centroide_latitud ← **Centro de la colonia**
 activo
 fecha_creacion
 
-**6. Entidad INCIDENTE** ← **MEJORADA**
+**6. Entidad INCIDENTE** 
    columnas:
 id_incidente (PK)
 folio_incidente (unique)
@@ -272,9 +272,9 @@ fecha_registro_incidente
 reporte (descripción textual)
 id_clasificacion (FK → clasificacion)
 id_colonia (FK → colonia)
-id_estado (FK → estado_incidente) ← **NUEVO: FK validada**
-longitud_incidente ← **NUEVO: Punto exacto del incidente**
-latitud_incidente ← **NUEVO: Punto exacto del incidente**
+id_estado (FK → estado_incidente) ← **FK validada**
+longitud_incidente ← **Punto exacto del incidente**
+latitud_incidente ← **Punto exacto del incidente**
 fecha_creacion
 fecha_actualizacion
 
@@ -307,7 +307,7 @@ ALCALDIA(id_alcaldia, nombre_alcaldia)
 
 **4NF** - La presencia de folio_incidente ↠ id_reporte (MVD) implica que la tabla original almacena dos grupos de atributos independientes: atributos del INCIDENTE y atributos del REPORTE. Para eliminar la MVD separamos en tablas INCIDENTE y REPORTE.
 
-**5NF VERDADERA** - Identificamos todas las dependencias de join y dominios finitos que deben ser catálogos:
+**5NF ** - Identificamos todas las dependencias de join y dominios finitos que deben ser catálogos:
 
 1. **CLASIFICACION**: Los valores de clasificación se repiten. Catálogo centralizado con atributos adicionales.
 
@@ -320,18 +320,18 @@ ALCALDIA(id_alcaldia, nombre_alcaldia)
 5. **Coordenadas específicas**: Diferenciamos centroide de colonia vs punto exacto del incidente (mejor granularidad geoespacial).
 
 **Justificación 5NF MEJORADA:** 
-- ✅ **Cada tabla representa un único concepto**
-- ✅ **CERO dependencias transitivas** (colonia→alcaldía ahora es FK)
-- ✅ **Todos los dominios finitos son catálogos validados**
-- ✅ **No existen proyecciones adicionales** sin pérdida de información
-- ✅ **Los catálogos facilitan mantenimiento** (actualizar alcaldía = 1 UPDATE)
-- ✅ **Integridad referencial total** (todas las relaciones con FKs)
-- ✅ **Sin anomalías** de inserción, actualización o eliminación
-- ✅ **Granularidad geoespacial mejorada** (centroide + punto exacto)
+-  **Cada tabla representa un único concepto**
+-  **CERO dependencias transitivas** (colonia→alcaldía ahora es FK)
+-  **Todos los dominios finitos son catálogos validados**
+-  **No existen proyecciones adicionales** sin pérdida de información
+-  **Los catálogos facilitan mantenimiento** (actualizar alcaldía = 1 UPDATE)
+-  **Integridad referencial total** (todas las relaciones con FKs)
+-  **Sin anomalías** de inserción, actualización o eliminación
+-  **Granularidad geoespacial mejorada** (centroide + punto exacto)
 
 <img width="2283" height="2503" alt="Untitled diagram-2025-12-01-170852" src="https://github.com/user-attachments/assets/4a27c515-fa49-4019-8c4f-6a6ce5a7bb0e" />
 
-📋 **Para ver el diagrama ER detallado con cardinalidades, dependencias funcionales y ejemplos, consultar:** [`diagrama_er_5nf.md`](diagrama_er_5nf.md)
+**Para ver el diagrama ER detallado con cardinalidades, dependencias funcionales y ejemplos, consultar:** [`diagrama_er_5nf.md`](diagrama_er_5nf.md)
 
 ---
 
@@ -350,7 +350,7 @@ Consultas SQL para análisis exploratorio de datos, estadísticas descriptivas y
 ####  `03_limpieza_datos.sql`
 Procesos de limpieza y transformación de datos: eliminación de duplicados, normalización de valores, corrección de inconsistencias.
 
-####  `04_schema_5nf.sql` ⭐
+####  `04_schema_5nf.sql` 
 **Schema de base de datos normalizado hasta 5NF MEJORADO**
 
 Define la estructura completa de las **7 tablas normalizadas**:
@@ -370,7 +370,7 @@ Incluye:
 - Estados predefinidos poblados automáticamente
 - Comentarios detallados sobre el diseño mejorado
 
-####  `05_migracion_a_5nf.sql` ⭐
+####  `05_migracion_a_5nf.sql` 
 **Script de migración y carga de datos a 5NF MEJORADO**
 
 Transforma los datos del CSV original a las **7 tablas normalizadas** mediante:
@@ -393,7 +393,7 @@ Características MEJORADAS:
 - Reportes estadísticos por dimensión (alcaldía, estado, etc.)
 - Manejo robusto de duplicados con ON CONFLICT
 
-####  `06_consultas_ejemplo_5nf.sql` ⭐
+####  `06_consultas_ejemplo_5nf.sql` 
 **Consultas de ejemplo y análisis MEJORADAS**
 
 Colección de consultas SQL organizadas por categoría:
@@ -489,9 +489,9 @@ psql -U usuario -d reportes_agua_cdmx -f 06_consultas_ejemplo_5nf.sql
 El diseño puede verificarse reconstruyendo la tabla original mediante un JOIN completo de las **7 tablas**, demostrando que la descomposición es **sin pérdida de información** (lossless decomposition), requisito fundamental de la normalización hasta 5NF.
 
 Además, se puede verificar que:
-- ✅ No existen dependencias transitivas (colonia→alcaldía ahora es FK)
-- ✅ Todos los dominios finitos son catálogos validados
-- ✅ No hay repetición de valores en ninguna tabla
-- ✅ Todas las relaciones están formalizadas con FKs
+-  No existen dependencias transitivas (colonia→alcaldía ahora es FK)
+-  Todos los dominios finitos son catálogos validados
+-  No hay repetición de valores en ninguna tabla
+-  Todas las relaciones están formalizadas con FKs
 
 
