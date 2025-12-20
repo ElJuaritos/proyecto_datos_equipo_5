@@ -307,3 +307,109 @@ class PaginatedResponse(BaseModel):
     page: int
     page_size: int
     items: List[BaseModel]
+
+
+# =====================================================
+# ESTADÍSTICAS Y ANÁLISIS
+# =====================================================
+
+class ClasificacionStats(BaseModel):
+    """Estadísticas por clasificación"""
+    id_clasificacion: int
+    nombre_clasificacion: str
+    total_incidentes: int
+
+    class Config:
+        from_attributes = True
+
+
+class EstadoStats(BaseModel):
+    """Estadísticas por estado"""
+    id_estado: int
+    nombre_estado: str
+    total_incidentes: int
+
+    class Config:
+        from_attributes = True
+
+
+class MedioRecepcionStats(BaseModel):
+    """Estadísticas por medio de recepción"""
+    id_medio_recepcion: int
+    nombre_medio: str
+    total_reportes: int
+
+    class Config:
+        from_attributes = True
+
+
+class ColoniaStats(BaseModel):
+    """Estadísticas por colonia"""
+    id_colonia: int
+    nombre_colonia: str
+    total_incidentes: int
+
+    class Config:
+        from_attributes = True
+
+
+class AlcaldiaStats(BaseModel):
+    """Estadísticas por alcaldía"""
+    id_alcaldia: int
+    nombre_alcaldia: str
+    total_incidentes: int
+
+    class Config:
+        from_attributes = True
+
+
+class EstadisticasAlcaldiaResponse(BaseModel):
+    """Respuesta completa de estadísticas por alcaldía"""
+    alcaldia: AlcaldiaResponse
+    total_incidentes: int
+    total_colonias: int
+    clasificaciones_top: List[ClasificacionStats]
+    estados_actuales: List[EstadoStats]
+    colonias_mas_afectadas: List[ColoniaStats]
+
+
+class DashboardResponse(BaseModel):
+    """Respuesta del dashboard general"""
+    total_incidentes: int
+    total_reportes: int
+    total_colonias: int
+    total_alcaldias: int
+    incidentes_por_estado: List[EstadoStats]
+    incidentes_por_clasificacion: List[ClasificacionStats]
+    reportes_por_medio: List[MedioRecepcionStats]
+    alcaldias_top: List[AlcaldiaStats]
+    promedio_reportes_por_incidente: float
+
+
+class TemporalDataPoint(BaseModel):
+    """Punto de dato temporal"""
+    periodo: str  # Puede ser fecha "2024-01-15" o "2024-01" o "2024-W03"
+    total_incidentes: int
+
+
+class AnalisisTemporalResponse(BaseModel):
+    """Respuesta de análisis temporal"""
+    fecha_inicio: date
+    fecha_fin: date
+    agrupacion: str  # "dia", "semana", "mes"
+    datos: List[TemporalDataPoint]
+    total_periodo: int
+
+
+class ActualizacionMasivaRequest(BaseModel):
+    """Request para actualización masiva de estado"""
+    ids_incidentes: List[int] = Field(..., min_items=1, description="Lista de IDs de incidentes a actualizar")
+    nuevo_estado_id: int = Field(..., description="Nuevo estado a aplicar")
+
+
+class ActualizacionMasivaResponse(BaseModel):
+    """Respuesta de actualización masiva"""
+    total_solicitado: int
+    total_actualizado: int
+    ids_actualizados: List[int]
+    ids_no_encontrados: List[int]

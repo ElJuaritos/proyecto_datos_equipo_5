@@ -166,3 +166,113 @@ def eliminar_incidente(
         message="Incidente eliminado exitosamente (incluyendo reportes asociados)",
         detail=f"ID: {incidente_id}"
     )
+
+
+@router.get("/buscar/por-radio", response_model=List[schemas.IncidenteResponse])
+def buscar_incidentes_por_radio(
+    longitud: float = Query(..., description="Longitud del punto central", ge=-99.4, le=-98.9),
+    latitud: float = Query(..., description="Latitud del punto central", ge=19.0, le=19.6),
+    radio_km: float = Query(..., description="Radio de búsqueda en kilómetros", ge=0.1, le=20.0),
+    limit: int = Query(100, description="Máximo de resultados", ge=1, le=500),
+    db: Session = Depends(get_db)
+):
+    """
+    **Búsqueda de Incidentes por Radio Geográfico**
+    
+    Encuentra todos los incidentes dentro de un radio específico desde un punto central.
+    
+    **Parámetros:**
+    - **longitud**: Coordenada longitud del centro (-99.4 a -98.9 para CDMX)
+    - **latitud**: Coordenada latitud del centro (19.0 a 19.6 para CDMX)
+    - **radio_km**: Radio de búsqueda en kilómetros (0.1 a 20.0)
+    - **limit**: Máximo de incidentes a retornar (1 a 500)
+    
+    **Algoritmo:**
+    - Usa fórmula de Haversine para calcular distancias exactas
+    - Solo incluye incidentes con coordenadas específicas
+    - Retorna incidentes ordenados por proximidad
+    
+    **Casos de uso:**
+    - Análisis de incidentes cerca de una ubicación específica
+    - Identificar patrones de concentración
+    - Planificación de rutas de atención
+    - Estudios de proximidad geográfica
+    
+    **Ejemplo:**
+    ```
+    GET /incidentes/buscar/por-radio?longitud=-99.15&latitud=19.40&radio_km=2&limit=50
+    ```
+    """
+    try:
+        incidentes = crud.buscar_incidentes_por_radio(
+            db,
+            longitud=longitud,
+            latitud=latitud,
+            radio_km=radio_km,
+            limit=limit
+        )
+        return incidentes
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error en búsqueda geoespacial: {str(e)}"
+        )
+
+
+@router.post("/actualizar-estado-masivo", response_model=schemas.ActualizacionMasivaResponse)
+def actualizar_estado_masivo(
+    request: schemas.ActualizacionMasivaRequest,
+    db: Session = Depends(get_db)
+):
+    """
+    **Actualización Masiva de Estado de Incidentes**
+    
+    Permite cambiar el estado de múltiples incidentes en una sola operación.
+    
+    **Request Body:**
+    ```json
+    {
+        "ids_incidentes": [1, 2, 3, 4, 5],
+        "nuevo_estado_id": 3
+    }
+    ```
+    
+    **Respuesta:**
+    - Total de incidentes solicitados
+    - Total de incidentes actualizados exitosamente
+    - Lista de IDs actualizados
+    - Lista de IDs no encontrados (si los hay)
+    
+    **Casos de uso:**
+    - Cerrar múltiples incidentes después de una jornada de atención masiva
+    - Actualizar estado de incidentes filtrados previamente
+    - Operaciones administrativas batch
+    - Sincronización con sistemas externos
+    
+    **Validaciones:**
+    - Verifica que el nuevo estado exista en el catálogo
+    - Solo actualiza incidentes que existen en la BD
+    - Retorna información detallada de éxitos y fallos
+    
+    **Ejemplo de uso:**
+    1. Obtener lista de incidentes: `GET /incidentes?estado_id=1`
+    2. Extraer IDs de los que se quieren cerrar
+    3. Ejecutar actualización masiva: `POST /incidentes/actualizar-estado-masivo`
+    """
+    try:
+        resultado = crud.actualizar_estado_masivo(
+            db,
+            ids_incidentes=request.ids_incidentes,
+            nuevo_estado_id=request.nuevo_estado_id
+        )
+        return resultado
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error en actualización masiva: {str(e)}"
+        )

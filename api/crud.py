@@ -394,3 +394,329 @@ def delete_reporte(db: Session, reporte_id: int) -> bool:
         db.commit()
         return True
     return False
+
+
+# =====================================================
+# FUNCIONES DE ESTADÍSTICAS Y ANÁLISIS
+# =====================================================
+
+def get_dashboard_stats(db: Session) -> dict:
+    """
+    Obtener estadísticas generales del sistema para dashboard
+    Retorna totales y distribuciones por diferentes dimensiones
+    """
+    from sqlalchemy import func, distinct
+    
+    # Totales generales
+    total_incidentes = db.query(func.count(models.Incidente.id_incidente)).scalar() or 0
+    total_reportes = db.query(func.count(models.Reporte.id_reporte_pk)).scalar() or 0
+    total_colonias = db.query(func.count(models.Colonia.id_colonia)).scalar() or 0
+    total_alcaldias = db.query(func.count(models.Alcaldia.id_alcaldia)).scalar() or 0
+    
+    # Promedio de reportes por incidente
+    promedio_reportes = 0.0
+    if total_incidentes > 0:
+        promedio_reportes = round(total_reportes / total_incidentes, 2)
+    
+    # Incidentes por estado
+    incidentes_por_estado = db.query(
+        models.EstadoIncidente.id_estado,
+        models.EstadoIncidente.nombre_estado,
+        func.count(models.Incidente.id_incidente).label('total_incidentes')
+    ).join(
+        models.Incidente, models.EstadoIncidente.id_estado == models.Incidente.id_estado
+    ).group_by(
+        models.EstadoIncidente.id_estado, models.EstadoIncidente.nombre_estado
+    ).order_by(func.count(models.Incidente.id_incidente).desc()).all()
+    
+    # Incidentes por clasificación
+    incidentes_por_clasificacion = db.query(
+        models.Clasificacion.id_clasificacion,
+        models.Clasificacion.nombre_clasificacion,
+        func.count(models.Incidente.id_incidente).label('total_incidentes')
+    ).join(
+        models.Incidente, models.Clasificacion.id_clasificacion == models.Incidente.id_clasificacion
+    ).group_by(
+        models.Clasificacion.id_clasificacion, models.Clasificacion.nombre_clasificacion
+    ).order_by(func.count(models.Incidente.id_incidente).desc()).all()
+    
+    # Reportes por medio de recepción
+    reportes_por_medio = db.query(
+        models.MedioRecepcion.id_medio_recepcion,
+        models.MedioRecepcion.nombre_medio,
+        func.count(models.Reporte.id_reporte_pk).label('total_reportes')
+    ).join(
+        models.Reporte, models.MedioRecepcion.id_medio_recepcion == models.Reporte.id_medio_recepcion
+    ).group_by(
+        models.MedioRecepcion.id_medio_recepcion, models.MedioRecepcion.nombre_medio
+    ).order_by(func.count(models.Reporte.id_reporte_pk).desc()).all()
+    
+    # Top alcaldías con más incidentes
+    alcaldias_top = db.query(
+        models.Alcaldia.id_alcaldia,
+        models.Alcaldia.nombre_alcaldia,
+        func.count(models.Incidente.id_incidente).label('total_incidentes')
+    ).join(
+        models.Colonia, models.Alcaldia.id_alcaldia == models.Colonia.id_alcaldia
+    ).join(
+        models.Incidente, models.Colonia.id_colonia == models.Incidente.id_colonia
+    ).group_by(
+        models.Alcaldia.id_alcaldia, models.Alcaldia.nombre_alcaldia
+    ).order_by(func.count(models.Incidente.id_incidente).desc()).limit(10).all()
+    
+    return {
+        'total_incidentes': total_incidentes,
+        'total_reportes': total_reportes,
+        'total_colonias': total_colonias,
+        'total_alcaldias': total_alcaldias,
+        'promedio_reportes_por_incidente': promedio_reportes,
+        'incidentes_por_estado': incidentes_por_estado,
+        'incidentes_por_clasificacion': incidentes_por_clasificacion,
+        'reportes_por_medio': reportes_por_medio,
+        'alcaldias_top': alcaldias_top
+    }
+
+
+def get_estadisticas_alcaldia(db: Session, alcaldia_id: int) -> Optional[dict]:
+    """
+    Obtener estadísticas detalladas de una alcaldía específica
+    """
+    from sqlalchemy import func
+    
+    alcaldia = get_alcaldia(db, alcaldia_id)
+    if not alcaldia:
+        return None
+    
+    # Total de incidentes en la alcaldía
+    total_incidentes = db.query(func.count(models.Incidente.id_incidente)).join(
+        models.Colonia, models.Incidente.id_colonia == models.Colonia.id_colonia
+    ).filter(models.Colonia.id_alcaldia == alcaldia_id).scalar() or 0
+    
+    # Total de colonias
+    total_colonias = db.query(func.count(models.Colonia.id_colonia)).filter(
+        models.Colonia.id_alcaldia == alcaldia_id
+    ).scalar() or 0
+    
+    # Clasificaciones más comunes
+    clasificaciones_top = db.query(
+        models.Clasificacion.id_clasificacion,
+        models.Clasificacion.nombre_clasificacion,
+        func.count(models.Incidente.id_incidente).label('total_incidentes')
+    ).join(
+        models.Incidente, models.Clasificacion.id_clasificacion == models.Incidente.id_clasificacion
+    ).join(
+        models.Colonia, models.Incidente.id_colonia == models.Colonia.id_colonia
+    ).filter(
+        models.Colonia.id_alcaldia == alcaldia_id
+    ).group_by(
+        models.Clasificacion.id_clasificacion, models.Clasificacion.nombre_clasificacion
+    ).order_by(func.count(models.Incidente.id_incidente).desc()).limit(5).all()
+    
+    # Estados actuales de incidentes
+    estados_actuales = db.query(
+        models.EstadoIncidente.id_estado,
+        models.EstadoIncidente.nombre_estado,
+        func.count(models.Incidente.id_incidente).label('total_incidentes')
+    ).join(
+        models.Incidente, models.EstadoIncidente.id_estado == models.Incidente.id_estado
+    ).join(
+        models.Colonia, models.Incidente.id_colonia == models.Colonia.id_colonia
+    ).filter(
+        models.Colonia.id_alcaldia == alcaldia_id
+    ).group_by(
+        models.EstadoIncidente.id_estado, models.EstadoIncidente.nombre_estado
+    ).order_by(func.count(models.Incidente.id_incidente).desc()).all()
+    
+    # Colonias más afectadas
+    colonias_mas_afectadas = db.query(
+        models.Colonia.id_colonia,
+        models.Colonia.nombre_colonia,
+        func.count(models.Incidente.id_incidente).label('total_incidentes')
+    ).join(
+        models.Incidente, models.Colonia.id_colonia == models.Incidente.id_colonia
+    ).filter(
+        models.Colonia.id_alcaldia == alcaldia_id
+    ).group_by(
+        models.Colonia.id_colonia, models.Colonia.nombre_colonia
+    ).order_by(func.count(models.Incidente.id_incidente).desc()).limit(10).all()
+    
+    return {
+        'alcaldia': alcaldia,
+        'total_incidentes': total_incidentes,
+        'total_colonias': total_colonias,
+        'clasificaciones_top': clasificaciones_top,
+        'estados_actuales': estados_actuales,
+        'colonias_mas_afectadas': colonias_mas_afectadas
+    }
+
+
+def get_analisis_temporal(
+    db: Session, 
+    fecha_inicio: str, 
+    fecha_fin: str, 
+    agrupacion: str = "mes"
+) -> dict:
+    """
+    Obtener análisis temporal de incidentes
+    agrupacion puede ser: 'dia', 'semana', 'mes'
+    """
+    from sqlalchemy import func, extract
+    from datetime import datetime
+    
+    # Convertir strings a fechas
+    fecha_inicio_dt = datetime.strptime(fecha_inicio, "%Y-%m-%d").date()
+    fecha_fin_dt = datetime.strptime(fecha_fin, "%Y-%m-%d").date()
+    
+    # Determinar el formato de agrupación
+    if agrupacion == "dia":
+        # Agrupar por día
+        query = db.query(
+            func.date(models.Incidente.fecha_registro_incidente).label('periodo'),
+            func.count(models.Incidente.id_incidente).label('total_incidentes')
+        ).filter(
+            models.Incidente.fecha_registro_incidente >= fecha_inicio_dt,
+            models.Incidente.fecha_registro_incidente <= fecha_fin_dt
+        ).group_by('periodo').order_by('periodo')
+        
+    elif agrupacion == "semana":
+        # Agrupar por año-semana
+        query = db.query(
+            func.concat(
+                func.extract('year', models.Incidente.fecha_registro_incidente),
+                '-W',
+                func.lpad(func.cast(func.extract('week', models.Incidente.fecha_registro_incidente), str), 2, '0')
+            ).label('periodo'),
+            func.count(models.Incidente.id_incidente).label('total_incidentes')
+        ).filter(
+            models.Incidente.fecha_registro_incidente >= fecha_inicio_dt,
+            models.Incidente.fecha_registro_incidente <= fecha_fin_dt
+        ).group_by('periodo').order_by('periodo')
+        
+    else:  # mes
+        # Agrupar por año-mes
+        query = db.query(
+            func.concat(
+                func.extract('year', models.Incidente.fecha_registro_incidente),
+                '-',
+                func.lpad(func.cast(func.extract('month', models.Incidente.fecha_registro_incidente), str), 2, '0')
+            ).label('periodo'),
+            func.count(models.Incidente.id_incidente).label('total_incidentes')
+        ).filter(
+            models.Incidente.fecha_registro_incidente >= fecha_inicio_dt,
+            models.Incidente.fecha_registro_incidente <= fecha_fin_dt
+        ).group_by('periodo').order_by('periodo')
+    
+    resultados = query.all()
+    
+    # Total del período
+    total_periodo = sum([r.total_incidentes for r in resultados])
+    
+    return {
+        'fecha_inicio': fecha_inicio_dt,
+        'fecha_fin': fecha_fin_dt,
+        'agrupacion': agrupacion,
+        'datos': [{'periodo': str(r.periodo), 'total_incidentes': r.total_incidentes} for r in resultados],
+        'total_periodo': total_periodo
+    }
+
+
+def buscar_incidentes_por_radio(
+    db: Session,
+    longitud: float,
+    latitud: float,
+    radio_km: float,
+    limit: int = 100
+) -> List[models.Incidente]:
+    """
+    Buscar incidentes dentro de un radio desde un punto central
+    Usa aproximación con fórmula de Haversine simplificada
+    """
+    from sqlalchemy import func, and_
+    
+    # Aproximación simple: 1 grado ≈ 111 km
+    # radio_grados = radio_km / 111
+    # Para mayor precisión, usar fórmula de Haversine completa
+    
+    # Filtro de bounding box primero (más eficiente)
+    delta_lat = radio_km / 111.0
+    delta_lon = radio_km / (111.0 * func.cos(func.radians(latitud)))
+    
+    incidentes = db.query(models.Incidente).filter(
+        and_(
+            models.Incidente.latitud_incidente.isnot(None),
+            models.Incidente.longitud_incidente.isnot(None),
+            models.Incidente.latitud_incidente >= latitud - delta_lat,
+            models.Incidente.latitud_incidente <= latitud + delta_lat,
+            models.Incidente.longitud_incidente >= longitud - delta_lon,
+            models.Incidente.longitud_incidente <= longitud + delta_lon
+        )
+    ).limit(limit).all()
+    
+    # Filtrar por distancia exacta usando Haversine
+    from math import radians, sin, cos, sqrt, atan2
+    
+    def calcular_distancia(lat1, lon1, lat2, lon2):
+        """Calcular distancia usando fórmula de Haversine"""
+        R = 6371.0  # Radio de la Tierra en km
+        
+        lat1_rad = radians(lat1)
+        lon1_rad = radians(lon1)
+        lat2_rad = radians(lat2)
+        lon2_rad = radians(lon2)
+        
+        dlon = lon2_rad - lon1_rad
+        dlat = lat2_rad - lat1_rad
+        
+        a = sin(dlat / 2)**2 + cos(lat1_rad) * cos(lat2_rad) * sin(dlon / 2)**2
+        c = 2 * atan2(sqrt(a), sqrt(1 - a))
+        
+        return R * c
+    
+    # Filtrar resultados por distancia exacta
+    incidentes_filtrados = []
+    for incidente in incidentes:
+        if incidente.latitud_incidente and incidente.longitud_incidente:
+            distancia = calcular_distancia(
+                latitud, longitud,
+                float(incidente.latitud_incidente), float(incidente.longitud_incidente)
+            )
+            if distancia <= radio_km:
+                incidentes_filtrados.append(incidente)
+    
+    return incidentes_filtrados
+
+
+def actualizar_estado_masivo(
+    db: Session,
+    ids_incidentes: List[int],
+    nuevo_estado_id: int
+) -> dict:
+    """
+    Actualizar el estado de múltiples incidentes a la vez
+    Retorna información sobre cuántos se actualizaron
+    """
+    # Verificar que el estado existe
+    estado = get_estado_incidente(db, nuevo_estado_id)
+    if not estado:
+        raise ValueError(f"Estado con ID {nuevo_estado_id} no existe")
+    
+    ids_actualizados = []
+    ids_no_encontrados = []
+    
+    for incidente_id in ids_incidentes:
+        incidente = get_incidente(db, incidente_id)
+        if incidente:
+            incidente.id_estado = nuevo_estado_id
+            ids_actualizados.append(incidente_id)
+        else:
+            ids_no_encontrados.append(incidente_id)
+    
+    if ids_actualizados:
+        db.commit()
+    
+    return {
+        'total_solicitado': len(ids_incidentes),
+        'total_actualizado': len(ids_actualizados),
+        'ids_actualizados': ids_actualizados,
+        'ids_no_encontrados': ids_no_encontrados
+    }

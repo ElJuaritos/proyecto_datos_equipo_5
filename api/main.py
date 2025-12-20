@@ -11,7 +11,7 @@ from fastapi.openapi.utils import get_openapi
 import time
 
 # Importar routers
-from routers import clasificacion, medio_recepcion, alcaldia, estado_incidente, colonia, incidente, reporte
+from routers import clasificacion, medio_recepcion, alcaldia, estado_incidente, colonia, incidente, reporte, estadisticas
 
 # Crear aplicación FastAPI
 app = FastAPI(
@@ -92,6 +92,7 @@ app.include_router(estado_incidente.router)
 app.include_router(colonia.router)
 app.include_router(incidente.router)
 app.include_router(reporte.router)
+app.include_router(estadisticas.router)
 
 
 # Endpoint raíz
@@ -114,7 +115,8 @@ async def root():
             "estados_incidente": "/estados-incidente",
             "colonias": "/colonias",
             "incidentes": "/incidentes",
-            "reportes": "/reportes"
+            "reportes": "/reportes",
+            "estadisticas": "/estadisticas"
         }
     }
 
