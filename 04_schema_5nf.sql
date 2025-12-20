@@ -305,20 +305,20 @@ ANÁLISIS DE DEPENDENCIAS FUNCIONALES:
 
 ALCALDIA:
   id_alcaldia → nombre_alcaldia, codigo_alcaldia
-  ✅ No hay dependencias transitivas
+   No hay dependencias transitivas
 
 COLONIA:
   id_colonia → nombre_colonia, id_alcaldia, codigo_postal, coordenadas
   nombre_colonia, id_alcaldia → id_colonia (clave alternativa)
-  ✅ No hay dependencias transitivas (alcaldia_catalogo eliminado)
+   No hay dependencias transitivas (alcaldia_catalogo eliminado)
 
 ESTADO_INCIDENTE:
   id_estado → nombre_estado, descripcion, orden
-  ✅ No hay dependencias transitivas
+   No hay dependencias transitivas
 
 INCIDENTE:
   id_incidente → todos los demás atributos
-  ✅ Solo dependencias funcionales directas de la PK
+   Solo dependencias funcionales directas de la PK
 
 VENTAJAS DEL DISEÑO MEJORADO:
 
@@ -366,13 +366,13 @@ COMPARACIÓN CON VERSIÓN ANTERIOR:
 
 Antes (5 tablas):
   clasificacion, medio_recepcion, ubicacion, incidente, reporte
-  ⚠️ ubicacion tenía dependencia transitiva (colonia→alcaldía)
-  ⚠️ incidente.estado era VARCHAR sin validación
+  ubicacion tenía dependencia transitiva (colonia→alcaldía)
+   incidente.estado era VARCHAR sin validación
 
 Después (7 tablas):
   clasificacion, medio_recepcion, alcaldia, estado_incidente, colonia, incidente, reporte
-  ✅ Todas las dependencias transitivas eliminadas
-  ✅ Todos los dominios finitos como catálogos
-  ✅ Verdadera 5NF
+   Todas las dependencias transitivas eliminadas
+   Todos los dominios finitos como catálogos
+   Verdadera 5NF
 
 */
