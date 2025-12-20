@@ -1,6 +1,4 @@
--- ============================================================================
 -- B) Análisis exploratorio de datos
--- ============================================================================
 
 -- 1. ¿Existen columnas con valores únicos?
 SELECT COUNT(DISTINCT folio_incidente) AS folios_unicos,

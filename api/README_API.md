@@ -2,20 +2,22 @@
 
 # API REST - Sistema de Reportes de Agua CDMX
 
-API RESTful construida con **FastAPI** para gestionar el sistema de reportes de agua de la Ciudad de México. Implementa operaciones CRUD completas para las 5 tablas normalizadas del schema 5NF.
+API RESTful construida con **FastAPI** para gestionar el sistema de reportes de agua de la Ciudad de México. Implementa operaciones CRUD completas para las **7 tablas normalizadas del schema 5NF MEJORADO**.
 
 ---
 
 ## 📋 Características
 
-- ✅ **5 Tablas Normalizadas (5NF)**: Clasificación, Medio Recepción, Ubicación, Incidente, Reporte
+- ✅ **7 Tablas Normalizadas (5NF Verdadero)**: Clasificación, Medio Recepción, **Alcaldía**, **Estado Incidente**, Colonia, Incidente, Reporte
 - ✅ **Operaciones CRUD completas** para todas las entidades
-- ✅ **Validaciones automáticas** con Pydantic
+- ✅ **Validaciones automáticas** con Pydantic (incluyendo estados y alcaldías)
 - ✅ **Documentación interactiva** con Swagger UI y ReDoc
-- ✅ **Paginación y filtros** en endpoints de lectura
-- ✅ **Integridad referencial** garantizada con Foreign Keys
+- ✅ **Paginación y filtros avanzados** en endpoints de lectura (por estado, alcaldía, etc.)
+- ✅ **Integridad referencial TOTAL** garantizada con Foreign Keys validadas
 - ✅ **CORS habilitado** para integraciones frontend
 - ✅ **Health checks** y logging de requests
+- ✅ **Sin dependencias transitivas** - 5NF verdadera alcanzada
+- ✅ **Gran ular idad geoespacial** - Centroide de colonia + punto exacto de incidente
 
 ---
 
@@ -24,7 +26,7 @@ API RESTful construida con **FastAPI** para gestionar el sistema de reportes de 
 ### Requisitos Previos
 
 - Python 3.8+
-- MySQL 8.0+ o MariaDB 10.5+
+- **PostgreSQL 12+** (base de datos utilizada)
 - pip (gestor de paquetes de Python)
 
 ### Paso 1: Clonar el repositorio
@@ -66,19 +68,19 @@ cp env.example .env
 2. Editar `.env` con tus credenciales:
 
 ```env
-DB_USER=root
+DB_USER=postgres
 DB_PASSWORD=tu_password
 DB_HOST=localhost
-DB_PORT=3306
+DB_PORT=5432
 DB_NAME=reportes_agua_cdmx
 ```
 
 ### Paso 5: Asegurar que la base de datos existe
 
 ```bash
-# Ejecutar los scripts SQL previos
-mysql -u root -p reportes_agua_cdmx < ../04_schema_5nf.sql
-mysql -u root -p reportes_agua_cdmx < ../05_migracion_a_5nf.sql
+# Ejecutar los scripts SQL previos en PostgreSQL
+psql -U postgres -d reportes_agua_cdmx -f ../04_schema_5nf.sql
+psql -U postgres -d reportes_agua_cdmx -f ../05_migracion_a_5nf.sql
 ```
 
 ---
@@ -133,65 +135,95 @@ Schema OpenAPI 3.0: **http://localhost:8000/openapi.json**
 
 ## 🔌 Endpoints Principales
 
-Todos los endpoints están bajo el prefijo `/api/v1`
+**Nota**: Los endpoints ya NO tienen el prefijo `/api/v1` (actualizado a rutas simples)
 
-### Clasificaciones
-
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| POST | `/api/v1/clasificaciones/` | Crear clasificación |
-| GET | `/api/v1/clasificaciones/` | Listar clasificaciones |
-| GET | `/api/v1/clasificaciones/{id}` | Obtener por ID |
-| PUT | `/api/v1/clasificaciones/{id}` | Actualizar |
-| DELETE | `/api/v1/clasificaciones/{id}` | Eliminar |
-
-### Medios de Recepción
+### 1. Clasificaciones
 
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
-| POST | `/api/v1/medios-recepcion/` | Crear medio |
-| GET | `/api/v1/medios-recepcion/` | Listar medios |
-| GET | `/api/v1/medios-recepcion/{id}` | Obtener por ID |
-| PUT | `/api/v1/medios-recepcion/{id}` | Actualizar |
-| DELETE | `/api/v1/medios-recepcion/{id}` | Eliminar |
+| POST | `/clasificaciones/` | Crear clasificación |
+| GET | `/clasificaciones/` | Listar clasificaciones |
+| GET | `/clasificaciones/{id}` | Obtener por ID |
+| PUT | `/clasificaciones/{id}` | Actualizar |
+| DELETE | `/clasificaciones/{id}` | Eliminar |
 
-### Ubicaciones
-
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| POST | `/api/v1/ubicaciones/` | Crear ubicación |
-| GET | `/api/v1/ubicaciones/` | Listar ubicaciones |
-| GET | `/api/v1/ubicaciones/{id}` | Obtener por ID |
-| PUT | `/api/v1/ubicaciones/{id}` | Actualizar |
-| DELETE | `/api/v1/ubicaciones/{id}` | Eliminar |
-
-**Filtros disponibles:** `?alcaldia=Iztapalapa`
-
-### Incidentes
+### 2. Medios de Recepción
 
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
-| POST | `/api/v1/incidentes/` | Crear incidente |
-| GET | `/api/v1/incidentes/` | Listar incidentes |
-| GET | `/api/v1/incidentes/{id}` | Obtener por ID |
-| GET | `/api/v1/incidentes/folio/{folio}` | Obtener por folio |
-| PUT | `/api/v1/incidentes/{id}` | Actualizar |
-| DELETE | `/api/v1/incidentes/{id}` | Eliminar (+ reportes) |
+| POST | `/medios-recepcion/` | Crear medio |
+| GET | `/medios-recepcion/` | Listar medios |
+| GET | `/medios-recepcion/{id}` | Obtener por ID |
+| PUT | `/medios-recepcion/{id}` | Actualizar |
+| DELETE | `/medios-recepcion/{id}` | Eliminar |
+
+### 3. Alcaldías ← **NUEVO**
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| POST | `/alcaldias/` | Crear alcaldía |
+| GET | `/alcaldias/` | Listar alcaldías (16 de CDMX) |
+| GET | `/alcaldias/{id}` | Obtener por ID |
+| PUT | `/alcaldias/{id}` | Actualizar |
+| DELETE | `/alcaldias/{id}` | Eliminar |
+
+**Beneficio**: Nombres de alcaldías almacenados 1 vez (sin redundancia)
+
+### 4. Estados de Incidente ← **NUEVO**
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| POST | `/estados-incidente/` | Crear estado |
+| GET | `/estados-incidente/` | Listar estados (ordenados) |
+| GET | `/estados-incidente/{id}` | Obtener por ID |
+| PUT | `/estados-incidente/{id}` | Actualizar |
+| DELETE | `/estados-incidente/{id}` | Eliminar |
+
+**Estados predefinidos**: Registrado, En Atención, Atendido, Cerrado, Cancelado
+
+### 5. Colonias (antes: Ubicaciones) ← **REFACTORIZADA**
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| POST | `/colonias/` | Crear colonia |
+| GET | `/colonias/` | Listar colonias |
+| GET | `/colonias/{id}` | Obtener por ID |
+| PUT | `/colonias/{id}` | Actualizar |
+| DELETE | `/colonias/{id}` | Eliminar |
+
+**Filtros disponibles:** `?alcaldia_id=3` (filtrar por ID de alcaldía)  
+**Mejora**: Ahora tiene FK a alcaldía (no almacena nombre repetido)
+
+### 6. Incidentes ← **MEJORADA**
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| POST | `/incidentes/` | Crear incidente |
+| GET | `/incidentes/` | Listar incidentes |
+| GET | `/incidentes/{id}` | Obtener por ID |
+| GET | `/incidentes/folio/{folio}` | Obtener por folio |
+| PUT | `/incidentes/{id}` | Actualizar (incluyendo estado) |
+| DELETE | `/incidentes/{id}` | Eliminar (+ reportes en cascada) |
 
 **Filtros disponibles:** 
-- `?clasificacion_id=1`
-- `?estado=Registrado`
+- `?clasificacion_id=1` - Por tipo de incidente
+- `?estado_id=2` - **NUEVO**: Por estado validado
+- `?alcaldia_id=3` - **NUEVO**: Por alcaldía (JOIN con colonia)
 
-### Reportes
+**Mejoras**:
+- `id_estado` ahora es FK validada (no más VARCHAR)
+- Incluye `longitud_incidente` y `latitud_incidente` (punto exacto)
+
+### 7. Reportes
 
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
-| POST | `/api/v1/reportes/` | Crear reporte |
-| GET | `/api/v1/reportes/` | Listar reportes |
-| GET | `/api/v1/reportes/{id}` | Obtener por ID |
-| GET | `/api/v1/reportes/codigo/{codigo}` | Obtener por código |
-| PUT | `/api/v1/reportes/{id}` | Actualizar |
-| DELETE | `/api/v1/reportes/{id}` | Eliminar |
+| POST | `/reportes/` | Crear reporte |
+| GET | `/reportes/` | Listar reportes |
+| GET | `/reportes/{id}` | Obtener por ID |
+| GET | `/reportes/codigo/{codigo}` | Obtener por código |
+| PUT | `/reportes/{id}` | Actualizar |
+| DELETE | `/reportes/{id}` | Eliminar |
 
 **Filtros disponibles:**
 - `?incidente_id=1`
@@ -202,7 +234,7 @@ Todos los endpoints están bajo el prefijo `/api/v1`
 Todos los endpoints GET de listado soportan paginación:
 
 ```
-GET /api/v1/incidentes/?skip=0&limit=50
+GET /incidentes/?skip=0&limit=50
 ```
 
 - `skip`: Número de registros a saltar (default: 0)

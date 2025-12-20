@@ -1,6 +1,4 @@
--- ============================================================================
 -- B) Carga inicial de datos
--- ============================================================================
 -- Este script crea la base de datos y carga el archivo CSV
 
 -- Paso 1: Crear la base de datos
@@ -36,7 +34,7 @@ CREATE TABLE agua_cdmx.reportes (
 -- Se usa LATIN1 que es más tolerante con caracteres especiales de Windows
 \copy agua_cdmx.reportes FROM 'C:\Users\eajae\OneDrive\Escritorio\Datos\proyecto_datos_equipo_5\reportes_agua_2024_01.csv' DELIMITER ',' CSV HEADER ENCODING 'LATIN1';
 
--- SI SIGUE DANDO ERROR, usa el script de Python para convertir a UTF-8:
+-- SI da ERROR, usa el script de Python para convertir a UTF-8:
 -- 1. Ejecuta: pip install -r requirements.txt
 -- 2. Ejecuta: python convertir_csv_utf8.py
 -- 3. Luego usa esta línea (descomenta y comenta la de arriba):

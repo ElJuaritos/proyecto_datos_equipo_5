@@ -1,6 +1,7 @@
 """
 Operaciones CRUD (Create, Read, Update, Delete) para todas las entidades
 Funciones reutilizables para interactuar con la base de datos
+VERSIÓN MEJORADA con Alcaldia y EstadoIncidente
 """
 
 from sqlalchemy.orm import Session
@@ -123,55 +124,150 @@ def delete_medio_recepcion(db: Session, medio_id: int) -> bool:
 
 
 # =====================================================
-# UBICACION CRUD
+# ALCALDIA CRUD (NUEVO)
 # =====================================================
 
-def create_ubicacion(db: Session, ubicacion: schemas.UbicacionCreate) -> models.Ubicacion:
-    """Crear una nueva ubicación"""
-    db_ubicacion = models.Ubicacion(**ubicacion.dict())
-    db.add(db_ubicacion)
+def create_alcaldia(db: Session, alcaldia: schemas.AlcaldiaCreate) -> models.Alcaldia:
+    """Crear una nueva alcaldía"""
+    db_alcaldia = models.Alcaldia(**alcaldia.dict())
+    db.add(db_alcaldia)
     db.commit()
-    db.refresh(db_ubicacion)
-    return db_ubicacion
+    db.refresh(db_alcaldia)
+    return db_alcaldia
 
 
-def get_ubicacion(db: Session, ubicacion_id: int) -> Optional[models.Ubicacion]:
-    """Obtener ubicación por ID"""
-    return get_by_id(db, models.Ubicacion, ubicacion_id, "id_colonia")
+def get_alcaldia(db: Session, alcaldia_id: int) -> Optional[models.Alcaldia]:
+    """Obtener alcaldía por ID"""
+    return get_by_id(db, models.Alcaldia, alcaldia_id, "id_alcaldia")
 
 
-def get_ubicaciones(db: Session, skip: int = 0, limit: int = 100, alcaldia: Optional[str] = None) -> List[models.Ubicacion]:
-    """Obtener lista de ubicaciones, opcionalmente filtrada por alcaldía"""
-    query = db.query(models.Ubicacion)
-    if alcaldia:
-        query = query.filter(models.Ubicacion.alcaldia_catalogo == alcaldia)
-    return query.offset(skip).limit(limit).all()
+def get_alcaldias(db: Session, skip: int = 0, limit: int = 100) -> List[models.Alcaldia]:
+    """Obtener lista de alcaldías"""
+    return get_all(db, models.Alcaldia, skip, limit)
 
 
-def update_ubicacion(db: Session, ubicacion_id: int, ubicacion: schemas.UbicacionUpdate) -> Optional[models.Ubicacion]:
-    """Actualizar una ubicación"""
-    db_ubicacion = get_ubicacion(db, ubicacion_id)
-    if db_ubicacion:
-        update_data = ubicacion.dict(exclude_unset=True)
+def update_alcaldia(db: Session, alcaldia_id: int, alcaldia: schemas.AlcaldiaUpdate) -> Optional[models.Alcaldia]:
+    """Actualizar una alcaldía"""
+    db_alcaldia = get_alcaldia(db, alcaldia_id)
+    if db_alcaldia:
+        update_data = alcaldia.dict(exclude_unset=True)
         for key, value in update_data.items():
-            setattr(db_ubicacion, key, value)
+            setattr(db_alcaldia, key, value)
         db.commit()
-        db.refresh(db_ubicacion)
-    return db_ubicacion
+        db.refresh(db_alcaldia)
+    return db_alcaldia
 
 
-def delete_ubicacion(db: Session, ubicacion_id: int) -> bool:
-    """Eliminar una ubicación"""
-    db_ubicacion = get_ubicacion(db, ubicacion_id)
-    if db_ubicacion:
-        db.delete(db_ubicacion)
+def delete_alcaldia(db: Session, alcaldia_id: int) -> bool:
+    """Eliminar una alcaldía"""
+    db_alcaldia = get_alcaldia(db, alcaldia_id)
+    if db_alcaldia:
+        db.delete(db_alcaldia)
         db.commit()
         return True
     return False
 
 
 # =====================================================
-# INCIDENTE CRUD
+# ESTADO_INCIDENTE CRUD (NUEVO)
+# =====================================================
+
+def create_estado_incidente(db: Session, estado: schemas.EstadoIncidenteCreate) -> models.EstadoIncidente:
+    """Crear un nuevo estado de incidente"""
+    db_estado = models.EstadoIncidente(**estado.dict())
+    db.add(db_estado)
+    db.commit()
+    db.refresh(db_estado)
+    return db_estado
+
+
+def get_estado_incidente(db: Session, estado_id: int) -> Optional[models.EstadoIncidente]:
+    """Obtener estado de incidente por ID"""
+    return get_by_id(db, models.EstadoIncidente, estado_id, "id_estado")
+
+
+def get_estados_incidente(db: Session, skip: int = 0, limit: int = 100) -> List[models.EstadoIncidente]:
+    """Obtener lista de estados de incidente"""
+    return db.query(models.EstadoIncidente).order_by(models.EstadoIncidente.orden).offset(skip).limit(limit).all()
+
+
+def update_estado_incidente(db: Session, estado_id: int, estado: schemas.EstadoIncidenteUpdate) -> Optional[models.EstadoIncidente]:
+    """Actualizar un estado de incidente"""
+    db_estado = get_estado_incidente(db, estado_id)
+    if db_estado:
+        update_data = estado.dict(exclude_unset=True)
+        for key, value in update_data.items():
+            setattr(db_estado, key, value)
+        db.commit()
+        db.refresh(db_estado)
+    return db_estado
+
+
+def delete_estado_incidente(db: Session, estado_id: int) -> bool:
+    """Eliminar un estado de incidente"""
+    db_estado = get_estado_incidente(db, estado_id)
+    if db_estado:
+        db.delete(db_estado)
+        db.commit()
+        return True
+    return False
+
+
+# =====================================================
+# COLONIA CRUD (REFACTORIZADA - antes: UBICACION)
+# =====================================================
+
+def create_colonia(db: Session, colonia: schemas.ColoniaCreate) -> models.Colonia:
+    """Crear una nueva colonia"""
+    db_colonia = models.Colonia(**colonia.dict())
+    db.add(db_colonia)
+    db.commit()
+    db.refresh(db_colonia)
+    return db_colonia
+
+
+def get_colonia(db: Session, colonia_id: int) -> Optional[models.Colonia]:
+    """Obtener colonia por ID"""
+    return get_by_id(db, models.Colonia, colonia_id, "id_colonia")
+
+
+def get_colonias(
+    db: Session, 
+    skip: int = 0, 
+    limit: int = 100, 
+    alcaldia_id: Optional[int] = None
+) -> List[models.Colonia]:
+    """Obtener lista de colonias, opcionalmente filtrada por alcaldía"""
+    query = db.query(models.Colonia)
+    if alcaldia_id:
+        query = query.filter(models.Colonia.id_alcaldia == alcaldia_id)
+    return query.offset(skip).limit(limit).all()
+
+
+def update_colonia(db: Session, colonia_id: int, colonia: schemas.ColoniaUpdate) -> Optional[models.Colonia]:
+    """Actualizar una colonia"""
+    db_colonia = get_colonia(db, colonia_id)
+    if db_colonia:
+        update_data = colonia.dict(exclude_unset=True)
+        for key, value in update_data.items():
+            setattr(db_colonia, key, value)
+        db.commit()
+        db.refresh(db_colonia)
+    return db_colonia
+
+
+def delete_colonia(db: Session, colonia_id: int) -> bool:
+    """Eliminar una colonia"""
+    db_colonia = get_colonia(db, colonia_id)
+    if db_colonia:
+        db.delete(db_colonia)
+        db.commit()
+        return True
+    return False
+
+
+# =====================================================
+# INCIDENTE CRUD (MEJORADO)
 # =====================================================
 
 def create_incidente(db: Session, incidente: schemas.IncidenteCreate) -> models.Incidente:
@@ -198,14 +294,22 @@ def get_incidentes(
     skip: int = 0, 
     limit: int = 100,
     clasificacion_id: Optional[int] = None,
-    estado: Optional[str] = None
+    estado_id: Optional[int] = None,
+    alcaldia_id: Optional[int] = None
 ) -> List[models.Incidente]:
     """Obtener lista de incidentes con filtros opcionales"""
     query = db.query(models.Incidente)
+    
     if clasificacion_id:
         query = query.filter(models.Incidente.id_clasificacion == clasificacion_id)
-    if estado:
-        query = query.filter(models.Incidente.estado == estado)
+    
+    if estado_id:
+        query = query.filter(models.Incidente.id_estado == estado_id)
+    
+    if alcaldia_id:
+        # Filtrar por alcaldía requiere JOIN con colonia
+        query = query.join(models.Colonia).filter(models.Colonia.id_alcaldia == alcaldia_id)
+    
     return query.offset(skip).limit(limit).all()
 
 
@@ -290,4 +394,3 @@ def delete_reporte(db: Session, reporte_id: int) -> bool:
         db.commit()
         return True
     return False
-

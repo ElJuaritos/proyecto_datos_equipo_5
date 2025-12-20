@@ -1,6 +1,7 @@
 """
 Router para endpoints de Incidente
 Operaciones CRUD: Create, Read, Update, Delete
+MEJORADO - Ahora con estado_id y coordenadas de incidente
 """
 
 from fastapi import APIRouter, Depends, HTTPException, status, Query
@@ -29,8 +30,10 @@ def crear_incidente(
     - **fecha_registro_incidente**: Fecha de registro oficial
     - **reporte**: Descripción del incidente
     - **id_clasificacion**: ID de la clasificación del incidente
-    - **id_colonia**: ID de la ubicación (opcional)
-    - **estado**: Estado del incidente (default: "Registrado")
+    - **id_colonia**: ID de la colonia (opcional)
+    - **id_estado**: ID del estado del incidente (default: 1 = "Registrado")
+    - **longitud_incidente**: Coordenada exacta del punto del incidente
+    - **latitud_incidente**: Coordenada exacta del punto del incidente
     """
     # Verificar que no exista el folio
     existing = crud.get_incidente_by_folio(db, incidente.folio_incidente)
@@ -54,23 +57,26 @@ def listar_incidentes(
     skip: int = 0,
     limit: int = 100,
     clasificacion_id: Optional[int] = Query(None, description="Filtrar por clasificación"),
-    estado: Optional[str] = Query(None, description="Filtrar por estado"),
+    estado_id: Optional[int] = Query(None, description="Filtrar por estado"),
+    alcaldia_id: Optional[int] = Query(None, description="Filtrar por alcaldía"),
     db: Session = Depends(get_db)
 ):
     """
-    Obtener lista de incidentes
+    Obtener lista de todos los incidentes
     
     - **skip**: Número de registros a saltar (para paginación)
     - **limit**: Número máximo de registros a retornar
-    - **clasificacion_id**: Filtrar por ID de clasificación (opcional)
-    - **estado**: Filtrar por estado del incidente (opcional)
+    - **clasificacion_id**: Filtrar por tipo de clasificación (opcional)
+    - **estado_id**: Filtrar por estado del incidente (opcional)
+    - **alcaldia_id**: Filtrar por alcaldía (opcional)
     """
     incidentes = crud.get_incidentes(
-        db,
-        skip=skip,
-        limit=limit,
+        db, 
+        skip=skip, 
+        limit=limit, 
         clasificacion_id=clasificacion_id,
-        estado=estado
+        estado_id=estado_id,
+        alcaldia_id=alcaldia_id
     )
     return incidentes
 
@@ -82,6 +88,8 @@ def obtener_incidente_por_folio(
 ):
     """
     Obtener un incidente por su folio único
+    
+    Útil para búsquedas por folio de incidente (ej: "I-20220101-0001")
     """
     db_incidente = crud.get_incidente_by_folio(db, folio=folio)
     if db_incidente is None:
@@ -119,8 +127,17 @@ def actualizar_incidente(
     Actualizar un incidente existente
     
     Todos los campos son opcionales. Solo se actualizarán los campos proporcionados.
+    
+    Casos de uso:
+    - Actualizar estado: cambiar de "Registrado" a "En Atención"
+    - Actualizar ubicación: agregar o corregir colonia
+    - Actualizar coordenadas: corregir punto exacto del incidente
     """
-    db_incidente = crud.update_incidente(db, incidente_id=incidente_id, incidente=incidente)
+    db_incidente = crud.update_incidente(
+        db, 
+        incidente_id=incidente_id, 
+        incidente=incidente
+    )
     if db_incidente is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -149,4 +166,3 @@ def eliminar_incidente(
         message="Incidente eliminado exitosamente (incluyendo reportes asociados)",
         detail=f"ID: {incidente_id}"
     )
-

@@ -11,7 +11,7 @@ from fastapi.openapi.utils import get_openapi
 import time
 
 # Importar routers
-from routers import clasificacion, medio_recepcion, ubicacion, incidente, reporte
+from routers import clasificacion, medio_recepcion, alcaldia, estado_incidente, colonia, incidente, reporte
 
 # Crear aplicación FastAPI
 app = FastAPI(
@@ -54,7 +54,6 @@ app = FastAPI(
     version="1.0.0",
     contact={
         "name": "Equipo 5",
-        "email": "contacto@ejemplo.com",
     },
     license_info={
         "name": "MIT",
@@ -85,12 +84,14 @@ async def log_requests(request: Request, call_next):
     return response
 
 
-# Incluir routers
-app.include_router(clasificacion.router, prefix="/api/v1")
-app.include_router(medio_recepcion.router, prefix="/api/v1")
-app.include_router(ubicacion.router, prefix="/api/v1")
-app.include_router(incidente.router, prefix="/api/v1")
-app.include_router(reporte.router, prefix="/api/v1")
+# Incluir routers (sin prefijo para endpoints simples)
+app.include_router(clasificacion.router)
+app.include_router(medio_recepcion.router)
+app.include_router(alcaldia.router)
+app.include_router(estado_incidente.router)
+app.include_router(colonia.router)
+app.include_router(incidente.router)
+app.include_router(reporte.router)
 
 
 # Endpoint raíz
@@ -107,11 +108,13 @@ async def root():
         "openapi": "/openapi.json",
         "status": "active",
         "endpoints": {
-            "clasificaciones": "/api/v1/clasificaciones",
-            "medios_recepcion": "/api/v1/medios-recepcion",
-            "ubicaciones": "/api/v1/ubicaciones",
-            "incidentes": "/api/v1/incidentes",
-            "reportes": "/api/v1/reportes"
+            "clasificaciones": "/clasificaciones",
+            "medios_recepcion": "/medios-recepcion",
+            "alcaldias": "/alcaldias",
+            "estados_incidente": "/estados-incidente",
+            "colonias": "/colonias",
+            "incidentes": "/incidentes",
+            "reportes": "/reportes"
         }
     }
 

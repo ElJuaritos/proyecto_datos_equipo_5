@@ -1,6 +1,7 @@
 """
 Modelos de SQLAlchemy para las tablas de la base de datos
-Corresponden al schema 5NF definido en 04_schema_5nf.sql
+Corresponden al schema 5NF MEJORADO definido en 04_schema_5nf.sql
+Incluye nuevas tablas: Alcaldia y EstadoIncidente
 """
 
 from sqlalchemy import Column, Integer, String, Date, Time, ForeignKey, DECIMAL, Boolean, TIMESTAMP, Text
@@ -37,24 +38,55 @@ class MedioRecepcion(Base):
     reportes = relationship("Reporte", back_populates="medio_recepcion")
 
 
-class Ubicacion(Base):
-    """Datos geográficos: colonias, alcaldías y coordenadas"""
-    __tablename__ = "ubicacion"
+class Alcaldia(Base):
+    """Catálogo de alcaldías de la CDMX (NUEVO)"""
+    __tablename__ = "alcaldia"
 
-    id_colonia = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    colonia_catalogo = Column(String(255), unique=True, nullable=False)
-    alcaldia_catalogo = Column(String(100), nullable=False, index=True)
-    longitud = Column(DECIMAL(11, 8), nullable=True)
-    latitud = Column(DECIMAL(11, 8), nullable=True)
+    id_alcaldia = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    nombre_alcaldia = Column(String(100), unique=True, nullable=False, index=True)
+    codigo_alcaldia = Column(String(10), nullable=True)
+    activo = Column(Boolean, default=True)
+    fecha_creacion = Column(TIMESTAMP, server_default=func.current_timestamp())
+
+    # Relación con colonias
+    colonias = relationship("Colonia", back_populates="alcaldia")
+
+
+class EstadoIncidente(Base):
+    """Catálogo de estados del ciclo de vida de un incidente (NUEVO)"""
+    __tablename__ = "estado_incidente"
+
+    id_estado = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    nombre_estado = Column(String(50), unique=True, nullable=False, index=True)
+    descripcion = Column(String(255), nullable=True)
+    orden = Column(Integer, nullable=True)
     activo = Column(Boolean, default=True)
     fecha_creacion = Column(TIMESTAMP, server_default=func.current_timestamp())
 
     # Relación con incidentes
-    incidentes = relationship("Incidente", back_populates="ubicacion")
+    incidentes = relationship("Incidente", back_populates="estado")
+
+
+class Colonia(Base):
+    """Datos geográficos de colonias (REFACTORIZADA: antes Ubicacion)"""
+    __tablename__ = "colonia"
+
+    id_colonia = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    nombre_colonia = Column(String(255), nullable=False)
+    id_alcaldia = Column(Integer, ForeignKey("alcaldia.id_alcaldia"), nullable=False, index=True)
+    codigo_postal = Column(String(5), nullable=True)
+    centroide_longitud = Column(DECIMAL(11, 8), nullable=True)
+    centroide_latitud = Column(DECIMAL(11, 8), nullable=True)
+    activo = Column(Boolean, default=True)
+    fecha_creacion = Column(TIMESTAMP, server_default=func.current_timestamp())
+
+    # Relaciones
+    alcaldia = relationship("Alcaldia", back_populates="colonias")
+    incidentes = relationship("Incidente", back_populates="colonia")
 
 
 class Incidente(Base):
-    """Entidad principal de incidentes/eventos reportados"""
+    """Entidad principal de incidentes/eventos reportados (MEJORADA)"""
     __tablename__ = "incidente"
 
     id_incidente = Column(Integer, primary_key=True, index=True, autoincrement=True)
@@ -62,14 +94,20 @@ class Incidente(Base):
     fecha_registro_incidente = Column(Date, nullable=False, index=True)
     reporte = Column(String(500), nullable=False)
     id_clasificacion = Column(Integer, ForeignKey("clasificacion.id_clasificacion"), nullable=False, index=True)
-    id_colonia = Column(Integer, ForeignKey("ubicacion.id_colonia"), nullable=True, index=True)
-    estado = Column(String(50), default="Registrado", index=True)
+    id_colonia = Column(Integer, ForeignKey("colonia.id_colonia"), nullable=True, index=True)
+    id_estado = Column(Integer, ForeignKey("estado_incidente.id_estado"), nullable=False, default=1, index=True)
+    
+    # Coordenadas específicas del incidente (punto exacto)
+    longitud_incidente = Column(DECIMAL(11, 8), nullable=True)
+    latitud_incidente = Column(DECIMAL(11, 8), nullable=True)
+    
     fecha_creacion = Column(TIMESTAMP, server_default=func.current_timestamp(), index=True)
     fecha_actualizacion = Column(TIMESTAMP, server_default=func.current_timestamp(), onupdate=func.current_timestamp())
 
     # Relaciones
     clasificacion = relationship("Clasificacion", back_populates="incidentes")
-    ubicacion = relationship("Ubicacion", back_populates="incidentes")
+    colonia = relationship("Colonia", back_populates="incidentes")
+    estado = relationship("EstadoIncidente", back_populates="incidentes")
     reportes = relationship("Reporte", back_populates="incidente", cascade="all, delete-orphan")
 
 
@@ -88,4 +126,3 @@ class Reporte(Base):
     # Relaciones
     incidente = relationship("Incidente", back_populates="reportes")
     medio_recepcion = relationship("MedioRecepcion", back_populates="reportes")
-
