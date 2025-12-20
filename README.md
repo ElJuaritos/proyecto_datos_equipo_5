@@ -15,7 +15,7 @@
 - **diagrama_er_5nf.md**: Documentación técnica del modelo de datos normalizado
 - **ANALISIS_RESULTADOS.md**: Resultados e interpretación del análisis de datos
 - **RESUMEN_PROYECTO.md**: Checklist de cumplimiento de requisitos
-- **api/README_API.md**: Documentación completa de la API REST
+- **README_API.md**: Documentación completa de la API REST
 
 ---
 

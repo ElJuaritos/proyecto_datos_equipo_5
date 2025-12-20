@@ -124,7 +124,7 @@
 5. `diagrama_er_5nf.md` - Diagrama ER y normalización
 6. `ANALISIS_RESULTADOS.md` - Resultados e interpretación
 7. `RESUMEN_PROYECTO.md` - Este documento
-8. `api/README_API.md` - Documentación de la API
+8. `README_API.md` - Documentación de la API
 
 ### API FastAPI
 ```
@@ -189,7 +189,7 @@ Ver: http://localhost:8000/docs
 | Implementación técnica | GUIA_IMPLEMENTACION.md |
 | Modelo de datos | diagrama_er_5nf.md |
 | Análisis de resultados | ANALISIS_RESULTADOS.md |
-| API REST | api/README_API.md |
+| API REST | README_API.md |
 | Pruebas con Postman | GUIA_POSTMAN.md |
 
 ---
