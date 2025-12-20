@@ -152,12 +152,6 @@ Score = (Total Incidentes × 0.4) + (Total Reportes × 0.3) + (Promedio Reportes
 2. **Problemas no resueltos** que generan múltiples llamadas
 3. **Falta de comunicación** sobre estatus de atención
 
-**Estrategia Diferenciada:**
-- **Score > 1,000 (Crítica):** Intervención inmediata con plan de obra mayor
-- **Score 500-1,000 (Alta):** Mantenimiento preventivo trimestral
-- **Score 200-500 (Media):** Monitoreo continuo y atención reactiva
-- **Score < 200 (Baja):** Programa regular de mantenimiento
-
 ---
 
 ## 5. Patrones Horarios de Demanda
@@ -195,11 +189,6 @@ Score = (Total Incidentes × 0.4) + (Total Reportes × 0.3) + (Promedio Reportes
 - Durante pausas de trabajo (hora de comida)
 - Al detectar problemas al regresar a casa
 - Cuando tienen tiempo libre para llamar
-
-**Optimización de Recursos:**
-- **Call Center:** Reforzar personal 12:00-18:00 hrs (35% de la demanda)
-- **Brigadas:** Programar turnos 06:00-18:00 hrs (61% de reportes)
-- **Fines de Semana:** Mantener 40% del personal (vs 50% actual = ahorro)
 
 **Madrugada (00:00-06:00):** Solo 9% de reportes, pero probablemente son **urgencias reales** (inundaciones, fugas mayores). Priorizar estos casos para atención inmediata.
 
@@ -245,18 +234,7 @@ Score = (Total Incidentes × 0.4) + (Total Reportes × 0.3) + (Promedio Reportes
 - **Impacto social:** ~15,000 personas afectadas repetidamente
 - **Pipas enviadas:** ~200 envíos (alto costo operativo)
 
-**Análisis Costo-Beneficio:**
-```
-Solución Reactiva (status quo):
-- 89 atenciones × $5,000 MXN = $445,000 MXN/año
-- + Pérdida de agua + Insatisfacción ciudadana
-
-Solución Preventiva (reemplazo):
-- Obra mayor: $280,000 MXN (una sola vez)
-- Ahorro neto: $165,000 MXN + beneficios intangibles
-```
-
-**Recomendación:** Priorizar reemplazo de infraestructura en las 20 ubicaciones con mayor reincidencia. ROI estimado: 18 meses.
+**Recomendación:** Priorizar reemplazo de infraestructura en las 20 ubicaciones con mayor reincidencia.
 
 ---
 
@@ -309,7 +287,6 @@ Solución Preventiva (reemplazo):
 
 **Cluster C1-C2 (Críticos):**
 - Proyecto de modernización integral de red
-- Instalación de válvulas de sectorización
 - Sistema de monitoreo en tiempo real
 
 **Cluster C3-C4 (Alta Demanda):**
@@ -363,18 +340,12 @@ Ventanilla █ 0.4%
 1. **Promoción de App Móvil:**
    - Campaña de difusión masiva
    - Incentivos para usuarios (seguimiento en tiempo real)
-   - Meta: Aumentar del 1.8% al 15% en 12 meses
+   - Meta: Aumentar del 1.8% al 15% 
    - Beneficio: Reducir carga del Call Center en ~40,000 llamadas
 
 2. **Mejora de Redes Sociales:**
-   - Integrar bot automatizado para captura inicial
    - Reducir tiempo de atención de 3.4 a 2.0 días
    - Aprovechar para comunicación proactiva
-
-3. **Optimización de Call Center:**
-   - IVR inteligente para clasificación automática
-   - Agentes enfocados en casos complejos
-   - Meta: Mantener 2.1 días con 30% menos personal
 
 ---
 
@@ -434,11 +405,6 @@ Donde cada componente pondera:
 - Problemas puntuales, no sistemáticos
 - Estrategia: Mantenimiento regular programado
 
-### Matriz de Priorización
-
-<img width="863" height="1024" alt="image" src="https://github.com/user-attachments/assets/a680a9a7-1e8e-4d91-8ec1-ae4624e5dc3a" />
-
-
 ---
 
 ## 10. Estacionalidad y Tendencias Anuales
@@ -482,35 +448,7 @@ Donde cada componente pondera:
 **Q4 (Oct-Dic) - Normalización:**
 - 61,457 reportes (-12.9%)
 - Regreso a niveles moderados
-- Preparación para siguiente ciclo
 
-### Interpretación y Recomendaciones
-
-**Estrategia Estacional:**
-
-**Enero-Marzo (Preparación):**
-- Mantenimiento preventivo intensivo
-- Revisión de bombas y sistemas eléctricos
-- Capacitación de personal
-- Contratación temporal para Q2
-
-**Abril-Junio (Contingencia):**
-- Reforzar brigadas en 40%
-- Call Center 24/7 con capacidad extendida
-- Comunicación proactiva sobre tandeos
-- Pipas disponibles en zonas críticas
-
-**Julio-Septiembre (Vigilancia):**
-- Monitoreo de drenaje preventivo
-- Desazolve antes de lluvias fuertes
-- Atención prioritaria a inundaciones
-- Sistema de alertas tempranas
-
-**Octubre-Diciembre (Evaluación):**
-- Análisis de desempeño anual
-- Identificación de mejoras
-- Planeación de inversión siguiente año
-- Reconocimiento a personal destacado
 
 ---
 
