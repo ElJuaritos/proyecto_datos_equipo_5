@@ -1,185 +1,123 @@
 # Guía de Implementación - Sistema de Reportes de Agua 5NF
 
-Esta guía proporciona instrucciones paso a paso para implementar el sistema de base de datos normalizado hasta 5NF.
+Instrucciones detalladas de implementación y solución de problemas.
 
 ---
 
 ## Requisitos Previos
 
-- MySQL 8.0+ o MariaDB 10.5+
-- Acceso a línea de comandos o MySQL Workbench
+- PostgreSQL 12+
+- Acceso a línea de comandos o pgAdmin
 - Python 3.8+ (opcional, para método alternativo de carga)
 - El archivo `reportes_agua_2024_01.csv`
 
 ---
 
-## Método 1: Implementación Completa con MySQL
+## Implementación Completa con PostgreSQL
 
 ### Paso 1: Crear la Base de Datos
 
 ```bash
-mysql -u root -p
+psql -U postgres
 ```
 
 ```sql
 CREATE DATABASE reportes_agua_cdmx 
-CHARACTER SET utf8mb4 
-COLLATE utf8mb4_unicode_ci;
+ENCODING 'UTF8'
+LC_COLLATE = 'es_MX.UTF-8'
+LC_CTYPE = 'es_MX.UTF-8';
 
-USE reportes_agua_cdmx;
+\c reportes_agua_cdmx
 
--- Verificar configuración
-SHOW VARIABLES LIKE 'character_set_database';
-SHOW VARIABLES LIKE 'collation_database';
+-- Verificar conexión
+SELECT current_database();
 ```
 
 ### Paso 2: Crear el Schema en 5NF
 
 ```bash
-mysql -u root -p reportes_agua_cdmx < 04_schema_5nf.sql
+psql -U postgres -d reportes_agua_cdmx -f 04_schema_5nf.sql
 ```
 
-**Verificar que las tablas se crearon correctamente:**
+**Verificar tablas creadas:**
 
 ```sql
-USE reportes_agua_cdmx;
+\dt
 
-SHOW TABLES;
-
--- Debe mostrar:
--- clasificacion
--- medio_recepcion
--- ubicacion
--- incidente
--- reporte
+-- Debe mostrar 7 tablas:
+-- clasificacion, medio_recepcion, alcaldia, estado_incidente, colonia, incidente, reporte
 
 -- Ver estructura de una tabla
-DESCRIBE incidente;
+\d incidente
 
 -- Ver claves foráneas
-SELECT 
-    TABLE_NAME,
-    COLUMN_NAME,
-    CONSTRAINT_NAME,
-    REFERENCED_TABLE_NAME,
-    REFERENCED_COLUMN_NAME
-FROM information_schema.KEY_COLUMN_USAGE
-WHERE TABLE_SCHEMA = 'reportes_agua_cdmx'
-AND REFERENCED_TABLE_NAME IS NOT NULL;
+SELECT
+    tc.table_name,
+    kcu.column_name,
+    ccu.table_name AS foreign_table_name,
+    ccu.column_name AS foreign_column_name
+FROM information_schema.table_constraints AS tc
+JOIN information_schema.key_column_usage AS kcu
+  ON tc.constraint_name = kcu.constraint_name
+JOIN information_schema.constraint_column_usage AS ccu
+  ON ccu.constraint_name = tc.constraint_name
+WHERE constraint_type = 'FOREIGN KEY'
+  AND tc.table_schema = 'public';
 ```
 
-### Paso 3: Cargar Datos del CSV
+### Paso 3: Ejecutar Migración a 5NF
 
-#### Opción A: Usando LOAD DATA INFILE (Más rápido)
-
-1. **Habilitar carga local de archivos:**
-
-```sql
-SET GLOBAL local_infile = 1;
-```
-
-2. **Salir y reconectar con flag:**
+El script `05_migracion_a_5nf.sql` crea la tabla temporal y carga los datos automáticamente.
 
 ```bash
-mysql -u root -p --local-infile=1 reportes_agua_cdmx
+psql -U postgres -d reportes_agua_cdmx -f 05_migracion_a_5nf.sql
 ```
 
-3. **Crear tabla temporal:**
-
-```sql
-CREATE TABLE reportes_agua_raw (
-    folio_incidente VARCHAR(50),
-    fecha_registro_incidente VARCHAR(50),
-    id_reporte VARCHAR(50),
-    fecha_reporte VARCHAR(50),
-    hora_reporte VARCHAR(50),
-    clasificacion VARCHAR(100),
-    reporte VARCHAR(500),
-    medio_recepcion VARCHAR(100),
-    alcaldia_catalogo VARCHAR(100),
-    colonia_catalogo VARCHAR(255),
-    longitud VARCHAR(50),
-    latitud VARCHAR(50)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-```
-
-4. **Cargar el CSV:**
-
-```sql
-LOAD DATA LOCAL INFILE 'C:/Users/eajae/OneDrive/Escritorio/Datos/proyecto_datos_equipo_5/reportes_agua_2024_01.csv'
-INTO TABLE reportes_agua_raw
-FIELDS TERMINATED BY ','
-ENCLOSED BY '"'
-LINES TERMINATED BY '\n'
-IGNORE 1 ROWS;
-
--- Verificar carga
-SELECT COUNT(*) FROM reportes_agua_raw;
--- Debe mostrar: 313757 (o similar)
-
-SELECT * FROM reportes_agua_raw LIMIT 10;
-```
-
-#### Opción B: Usando MySQL Workbench (GUI)
-
-1. Clic derecho en tabla `reportes_agua_raw` → **Table Data Import Wizard**
-2. Seleccionar el archivo CSV
-3. Configurar:
-   - Field Separator: `,`
-   - Line Separator: `\n` (Windows: `\r\n`)
-   - Encoding: `UTF-8`
-4. Mapear columnas automáticamente
-5. Ejecutar importación
-
-### Paso 4: Ejecutar Migración a 5NF
-
-```bash
-mysql -u root -p reportes_agua_cdmx < 05_migracion_a_5nf.sql
-```
-
-**Este script ejecuta automáticamente:**
-1. Extrae y carga catálogos únicos (CLASIFICACION, MEDIO_RECEPCION)
-2. Normaliza ubicaciones con validación de coordenadas
-3. Carga incidentes con relaciones FK
-4. Carga reportes con integridad referencial
-5. Genera estadísticas de validación
+**El script ejecuta:**
+1. Crea tabla temporal `reportes_agua_raw`
+2. Carga CSV con `\copy`
+3. Extrae y carga catálogos (CLASIFICACION, MEDIO_RECEPCION, ALCALDIA)
+4. Normaliza colonias con FK a alcaldía
+5. Carga incidentes con coordenadas exactas
+6. Carga reportes con integridad referencial
+7. Genera estadísticas de validación
 
 **Verificar resultados:**
 
 ```sql
 -- Conteo por tabla
-SELECT 'clasificacion' AS tabla, COUNT(*) AS total FROM clasificacion
-UNION ALL
-SELECT 'medio_recepcion', COUNT(*) FROM medio_recepcion
-UNION ALL
-SELECT 'ubicacion', COUNT(*) FROM ubicacion
-UNION ALL
-SELECT 'incidente', COUNT(*) FROM incidente
-UNION ALL
-SELECT 'reporte', COUNT(*) FROM reporte;
+SELECT 'clasificacion' AS tabla, COUNT(*) FROM clasificacion
+UNION ALL SELECT 'medio_recepcion', COUNT(*) FROM medio_recepcion
+UNION ALL SELECT 'alcaldia', COUNT(*) FROM alcaldia
+UNION ALL SELECT 'estado_incidente', COUNT(*) FROM estado_incidente
+UNION ALL SELECT 'colonia', COUNT(*) FROM colonia
+UNION ALL SELECT 'incidente', COUNT(*) FROM incidente
+UNION ALL SELECT 'reporte', COUNT(*) FROM reporte;
 
--- Ejemplo de resultados esperados:
--- clasificacion: 2-5 registros
--- medio_recepcion: 3-10 registros
--- ubicacion: 1000-2000 registros
--- incidente: ~100,000-200,000 registros
--- reporte: ~313,000 registros
+-- Resultado esperado:
+-- clasificacion: 2-5
+-- medio_recepcion: 3-10
+-- alcaldia: 16
+-- estado_incidente: 5
+-- colonia: 1000-2000
+-- incidente: 100,000-200,000
+-- reporte: 300,000+
 ```
 
-### Paso 5: Probar Consultas
+### Paso 4: Probar Consultas
 
 ```bash
-mysql -u root -p reportes_agua_cdmx < 06_consultas_ejemplo_5nf.sql
+psql -U postgres -d reportes_agua_cdmx -f 06_consultas_ejemplo_5nf.sql
 ```
 
 ---
 
-## Método 2: Implementación con Python
+## Método Alternativo: Carga con Python
 
 ### Requisitos
 
 ```bash
-pip install pandas pymysql sqlalchemy
+pip install pandas psycopg2-binary sqlalchemy
 ```
 
 ### Script de Carga
@@ -188,21 +126,20 @@ pip install pandas pymysql sqlalchemy
 # cargar_datos.py
 import pandas as pd
 from sqlalchemy import create_engine
-import pymysql
 
 # Configuración de conexión
 DB_CONFIG = {
-    'user': 'root',
+    'user': 'postgres',
     'password': 'tu_password',
     'host': 'localhost',
-    'database': 'reportes_agua_cdmx',
-    'charset': 'utf8mb4'
+    'port': '5432',
+    'database': 'reportes_agua_cdmx'
 }
 
 # Crear engine de SQLAlchemy
 engine = create_engine(
-    f"mysql+pymysql://{DB_CONFIG['user']}:{DB_CONFIG['password']}@"
-    f"{DB_CONFIG['host']}/{DB_CONFIG['database']}?charset={DB_CONFIG['charset']}"
+    f"postgresql://{DB_CONFIG['user']}:{DB_CONFIG['password']}@"
+    f"{DB_CONFIG['host']}:{DB_CONFIG['port']}/{DB_CONFIG['database']}"
 )
 
 # Leer CSV
@@ -211,18 +148,17 @@ df = pd.read_csv('reportes_agua_2024_01.csv', encoding='utf-8')
 print(f"Registros cargados: {len(df)}")
 
 # Cargar a tabla temporal
-print("Cargando datos a MySQL...")
+print("Cargando datos a PostgreSQL...")
 df.to_sql(
     name='reportes_agua_raw',
     con=engine,
     if_exists='replace',
     index=False,
-    chunksize=1000,
-    method='multi'
+    chunksize=1000
 )
 
-print(" Carga completada!")
-print("Ejecutar ahora: mysql -u root -p reportes_agua_cdmx < 05_migracion_a_5nf.sql")
+print("Carga completada!")
+print("Ejecutar ahora: psql -U postgres -d reportes_agua_cdmx -f 05_migracion_a_5nf.sql")
 ```
 
 **Ejecutar:**
@@ -276,27 +212,24 @@ SELECT
 
 ---
 
-## 🔧 Solución de Problemas Comunes
+## Solución de Problemas Comunes
 
-### Error: "The MySQL server is running with the --secure-file-priv option"
+### Error: "permission denied for database"
 
-**Problema:** MySQL restringe la carga de archivos.
+**Problema:** Usuario no tiene permisos.
 
-**Solución 1:** Verificar directorio permitido
+**Solución:**
 
 ```sql
-SHOW VARIABLES LIKE 'secure_file_priv';
+GRANT ALL PRIVILEGES ON DATABASE reportes_agua_cdmx TO postgres;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO postgres;
 ```
 
-Copiar el CSV al directorio mostrado y ajustar la ruta en LOAD DATA.
-
-**Solución 2:** Usar Python o MySQL Workbench en su lugar.
-
-### Error: "Data too long for column"
+### Error: "value too long for type character varying"
 
 **Problema:** Algún valor excede el tamaño de VARCHAR definido.
 
-**Solución:** Identificar y truncar valores largos
+**Solución:** Identificar valores largos
 
 ```sql
 SELECT 
@@ -307,9 +240,9 @@ FROM reportes_agua_raw;
 
 Ajustar tamaños en el schema si es necesario.
 
-### Error: "Cannot add foreign key constraint"
+### Error: "insert or update violates foreign key constraint"
 
-**Problema:** Hay valores en FK que no existen en la tabla referenciada.
+**Problema:** Valores en FK no existen en tabla referenciada.
 
 **Solución:** Verificar datos huérfanos
 
@@ -321,68 +254,73 @@ LEFT JOIN clasificacion c ON TRIM(r.clasificacion) = c.nombre_clasificacion
 WHERE c.id_clasificacion IS NULL;
 ```
 
-Cargar los catálogos faltantes antes de crear FKs.
+Cargar los catálogos faltantes antes de insertar datos.
 
 ### Performance Lenta en la Carga
 
-**Solución:** Optimizaciones
+**Optimizaciones:**
 
-1. **Deshabilitar temporalmente índices:**
-
-```sql
-ALTER TABLE incidente DISABLE KEYS;
--- Cargar datos
-ALTER TABLE incidente ENABLE KEYS;
-```
-
-2. **Aumentar tamaño de buffer:**
+1. **Usar transacciones:**
 
 ```sql
-SET SESSION bulk_insert_buffer_size = 256 * 1024 * 1024; -- 256MB
-```
-
-3. **Usar transacciones:**
-
-```sql
-START TRANSACTION;
+BEGIN;
 -- Inserts aquí
 COMMIT;
 ```
 
+2. **Deshabilitar triggers temporalmente:**
+
+```sql
+ALTER TABLE incidente DISABLE TRIGGER ALL;
+-- Cargar datos
+ALTER TABLE incidente ENABLE TRIGGER ALL;
+```
+
+3. **Aumentar work_mem:**
+
+```sql
+SET work_mem = '256MB';
+```
+
 ---
 
-##  Monitoreo de Performance
+## Monitoreo de Performance
 
 ### Analizar Uso de Índices
 
 ```sql
-EXPLAIN SELECT 
+EXPLAIN ANALYZE
+SELECT 
     i.folio_incidente,
     c.nombre_clasificacion,
-    u.colonia_catalogo
+    col.nombre_colonia,
+    a.nombre_alcaldia
 FROM incidente i
 INNER JOIN clasificacion c ON i.id_clasificacion = c.id_clasificacion
-LEFT JOIN ubicacion u ON i.id_colonia = u.id_colonia
+LEFT JOIN colonia col ON i.id_colonia = col.id_colonia
+LEFT JOIN alcaldia a ON col.id_alcaldia = a.id_alcaldia
 WHERE i.fecha_registro_incidente >= '2022-01-01';
 ```
 
 **Interpretar:**
-- `type: ALL` → Mal, full table scan
-- `type: ref` → Bien, usando índice
-- `type: eq_ref` → Excelente, join optimizado
+- `Seq Scan` → Mal, escaneo secuencial completo
+- `Index Scan` → Bien, usando índice
+- `Index Only Scan` → Excelente, solo índice
 
 ### Estadísticas de Tablas
 
 ```sql
-SHOW TABLE STATUS WHERE Name IN ('incidente', 'reporte', 'ubicacion');
-
 -- Ver tamaño de tablas
 SELECT 
-    TABLE_NAME,
-    ROUND((DATA_LENGTH + INDEX_LENGTH) / 1024 / 1024, 2) AS size_mb
-FROM information_schema.TABLES
-WHERE TABLE_SCHEMA = 'reportes_agua_cdmx'
-ORDER BY (DATA_LENGTH + INDEX_LENGTH) DESC;
+    schemaname,
+    tablename,
+    pg_size_pretty(pg_total_relation_size(schemaname||'.'||tablename)) AS size
+FROM pg_tables
+WHERE schemaname = 'public'
+ORDER BY pg_total_relation_size(schemaname||'.'||tablename) DESC;
+
+-- Actualizar estadísticas
+ANALYZE;
 ```
 
 ---
@@ -395,47 +333,35 @@ ORDER BY (DATA_LENGTH + INDEX_LENGTH) DESC;
 DROP TABLE IF EXISTS reportes_agua_raw;
 ```
 
-### Resetear Todo y Empezar de Nuevo
+### Resetear Todo
 
 ```sql
 DROP DATABASE IF EXISTS reportes_agua_cdmx;
-CREATE DATABASE reportes_agua_cdmx CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE reportes_agua_cdmx ENCODING 'UTF8';
 ```
 
 ---
 
-## Puntos de Implementación
+## Checklist de Implementación
 
--  Base de datos creada con encoding correcto
--  Schema 5NF ejecutado sin errores
--  CSV cargado a tabla temporal
--  Migración a 5NF completada
--  Verificación de conteos realizada
--  Integridad referencial validada
--  Consultas de ejemplo probadas
--  Tabla temporal eliminada (opcional)
-
----
-
-##  Recursos Adicionales
-
-- **Documentación MySQL:** https://dev.mysql.com/doc/
-- **Teoría de Normalización:** https://en.wikipedia.org/wiki/Database_normalization
-- **Optimización de Consultas:** https://dev.mysql.com/doc/refman/8.0/en/optimization.html
+- Base de datos creada con encoding correcto
+- Schema 5NF ejecutado sin errores
+- CSV cargado a tabla temporal
+- Migración a 5NF completada
+- Verificación de conteos realizada
+- Integridad referencial validada
+- Consultas de ejemplo probadas
 
 ---
 
 ## Soporte
 
-Si encuentra problemas durante la implementación:
+Si encuentra problemas:
 
-1. Revise los logs de MySQL: `/var/log/mysql/error.log` (Linux) o Event Viewer (Windows)
-2. Verifique permisos de usuario en MySQL
-3. Asegúrese de tener espacio en disco suficiente (al menos 1GB libre)
-4. Consulte el archivo `diagrama_er_5nf.md` para entender las relaciones
+1. Revisar logs de PostgreSQL: `/var/log/postgresql/` (Linux) o Event Viewer (Windows)
+2. Verificar permisos de usuario
+3. Asegurar espacio en disco suficiente (mínimo 1GB libre)
+4. Consultar `diagrama_er_5nf.md` para entender las relaciones
 
----
-
-**Última actualización:** 19 Diciembre 2025  
-**Versión del Schema:** 1.0 (5NF)
+**Para inicio rápido:** Ver `INICIO_RAPIDO.md`
 

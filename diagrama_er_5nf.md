@@ -1,16 +1,15 @@
-# Diagrama Entidad-Relación (ER) - Base de Datos en 5NF MEJORADO
+# Diagrama Entidad-Relación (ER) - Base de Datos en 5NF
 ## Sistema de Reportes de Agua - CDMX
 
 ---
 
-## 🔄 Cambios en la Nueva Versión
+## Mejoras del Diseño 5NF
 
-### Mejoras Implementadas:
 1. **Nueva tabla ALCALDIA**: Elimina dependencia transitiva colonia→alcaldía
 2. **Nueva tabla ESTADO_INCIDENTE**: Valida estados con catálogo cerrado
-3. **COLONIA refactorizada**: Ahora con FK a ALCALDIA
+3. **COLONIA refactorizada**: FK a ALCALDIA
 4. **INCIDENTE mejorado**: Coordenadas específicas del incidente
-5. **Verdadera 5NF**: Todas las dependencias transitivas eliminadas
+5. **5NF alcanzada**: Sin dependencias transitivas
 
 ---
 
@@ -93,42 +92,42 @@
 - **Constraint**: `ON DELETE RESTRICT` (no se puede eliminar una clasificación con incidentes asociados)
 - **Ejemplo**: "Agua Potable" → 150,000 incidentes
 
-### 2. ALCALDIA ──(1:N)── COLONIA [NUEVA RELACIÓN]
+### 2. ALCALDIA ──(1:N)── COLONIA
 - **Descripción**: Una alcaldía contiene múltiples colonias
 - **Cardinalidad**: 1:N
 - **FK en**: `colonia.id_alcaldia`
-- **Constraint**: `ON DELETE RESTRICT` (no se puede eliminar una alcaldía con colonias asociadas)
+- **Constraint**: `ON DELETE RESTRICT`
 - **Ejemplo**: "Benito Juárez" → 300 colonias
-- **⭐ MEJORA**: Elimina redundancia de almacenar "Benito Juárez" N veces
+- **Mejora**: Elimina redundancia, nombre almacenado una sola vez
 
-### 3. COLONIA ──(1:N)── INCIDENTE [REFACTORIZADA]
+### 3. COLONIA ──(1:N)── INCIDENTE
 - **Descripción**: Una colonia puede tener múltiples incidentes
 - **Cardinalidad**: 1:N
 - **FK en**: `incidente.id_colonia`
-- **Constraint**: `ON DELETE SET NULL` (si se elimina una colonia, los incidentes quedan sin ubicación)
+- **Constraint**: `ON DELETE SET NULL`
 - **Ejemplo**: "Del Valle Sur" → 500 incidentes
-- **⭐ MEJORA**: Ya no almacena alcaldia_catalogo (ahora es FK)
+- **Mejora**: FK a alcaldía en lugar de almacenar nombre
 
-### 4. ESTADO_INCIDENTE ──(1:N)── INCIDENTE [NUEVA RELACIÓN]
+### 4. ESTADO_INCIDENTE ──(1:N)── INCIDENTE
 - **Descripción**: Un estado puede aplicar a múltiples incidentes
 - **Cardinalidad**: 1:N
 - **FK en**: `incidente.id_estado`
-- **Constraint**: `ON DELETE RESTRICT` (no se puede eliminar un estado en uso)
+- **Constraint**: `ON DELETE RESTRICT`
 - **Ejemplo**: "Registrado" → 180,000 incidentes
-- **⭐ MEJORA**: Valida estados, evita typos y inconsistencias
+- **Mejora**: Valida estados, evita typos
 
-### 5. INCIDENTE ──(1:N)── REPORTE [SIN CAMBIOS]
-- **Descripción**: Un incidente puede generar múltiples reportes (llamadas, notificaciones)
+### 5. INCIDENTE ──(1:N)── REPORTE
+- **Descripción**: Un incidente puede generar múltiples reportes
 - **Cardinalidad**: 1:N
 - **FK en**: `reporte.id_incidente`
-- **Constraint**: `ON DELETE CASCADE` (si se elimina un incidente, se eliminan sus reportes)
+- **Constraint**: `ON DELETE CASCADE`
 - **Ejemplo**: Fuga en Coyoacán → 5 reportes de diferentes ciudadanos
 
-### 6. MEDIO_RECEPCION ──(1:N)── REPORTE [SIN CAMBIOS]
+### 6. MEDIO_RECEPCION ──(1:N)── REPORTE
 - **Descripción**: Un medio de recepción puede recibir múltiples reportes
 - **Cardinalidad**: 1:N
 - **FK en**: `reporte.id_medio_recepcion`
-- **Constraint**: `ON DELETE RESTRICT` (no se puede eliminar un medio con reportes asociados)
+- **Constraint**: `ON DELETE RESTRICT`
 - **Ejemplo**: "Ciudadano (Call Center)" → 200,000 reportes
 
 ---
@@ -147,33 +146,30 @@ id_medio_recepcion → nombre_medio, descripcion, activo, fecha_creacion
 ✅ Solo DF desde la PK
 ```
 
-### ALCALDIA [NUEVA]
+### ALCALDIA
 ```
 id_alcaldia → nombre_alcaldia, codigo_alcaldia, activo, fecha_creacion
-✅ Solo DF desde la PK
-✅ Elimina repetición de nombres de alcaldía
+Solo DF desde la PK
 ```
 
-### ESTADO_INCIDENTE [NUEVA]
+### ESTADO_INCIDENTE
 ```
 id_estado → nombre_estado, descripcion, orden, activo, fecha_creacion
-✅ Solo DF desde la PK
-✅ Dominio finito y validado
+Solo DF desde la PK, dominio finito validado
 ```
 
-### COLONIA [REFACTORIZADA]
+### COLONIA
 ```
-ANTES (con dependencia transitiva):
+ANTES:
   id_colonia → colonia_catalogo, alcaldia_catalogo, longitud, latitud
-  colonia_catalogo → alcaldia_catalogo  ❌ DEPENDENCIA TRANSITIVA
+  colonia_catalogo → alcaldia_catalogo  [DEPENDENCIA TRANSITIVA]
 
-DESPUÉS (sin dependencia transitiva):
+DESPUÉS:
   id_colonia → nombre_colonia, id_alcaldia, codigo_postal, centroide_longitud, centroide_latitud
-  ✅ Solo DF desde la PK o FKs
-  ✅ alcaldia_catalogo eliminado (ahora es FK)
+  Solo DF desde la PK o FKs
 ```
 
-### INCIDENTE [MEJORADO]
+### INCIDENTE
 ```
 id_incidente → folio_incidente, fecha_registro_incidente, reporte, 
                id_clasificacion, id_colonia, id_estado,
@@ -181,16 +177,14 @@ id_incidente → folio_incidente, fecha_registro_incidente, reporte,
                fecha_creacion, fecha_actualizacion
 
 folio_incidente → (todos los demás atributos)  // Clave alternativa
-
-✅ Solo DF desde la PK
-✅ Nuevos atributos: id_estado, longitud_incidente, latitud_incidente
+Solo DF desde la PK
 ```
 
-### REPORTE [SIN CAMBIOS]
+### REPORTE
 ```
 id_reporte_pk → id_reporte, id_incidente, fecha_reporte, hora_reporte, id_medio_recepcion
 id_reporte → (todos los demás atributos)  // Clave alternativa
-✅ Solo DF desde la PK
+Solo DF desde la PK
 ```
 
 ---

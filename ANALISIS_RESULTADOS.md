@@ -84,20 +84,20 @@ Analizar el comportamiento de los reportes de agua en la Ciudad de México para 
 
 | Métrica | Valor | Interpretación |
 |---------|-------|----------------|
-| **Promedio días de atención** | 2.3 días | 🟢 Dentro de estándar |
-| **Mediana** | 1 día | 🟢 La mayoría se atiende rápido |
-| **Percentil 90** | 7 días | 🟡 10% tarda más de una semana |
-| **Percentil 95** | 15 días | 🔴 5% tarda más de dos semanas |
-| **Máximo registrado** | 287 días | 🔴 Casos abandonados |
+| **Promedio días de atención** | 2.3 días | Dentro de estándar |
+| **Mediana** | 1 día | La mayoría se atiende rápido |
+| **Percentil 90** | 7 días | 10% tarda más de una semana |
+| **Percentil 95** | 15 días | 5% tarda más de dos semanas |
+| **Máximo registrado** | 287 días | Casos abandonados |
 
 ### Distribución por Cuartiles
 
 | Cuartil | Días de Atención | % de Casos | Evaluación |
 |---------|------------------|------------|------------|
-| Q1 (25%) | 0-1 días | 25% | ⚡ Excelente |
-| Q2 (50%) | 1-2 días | 25% | 🟢 Bueno |
-| Q3 (75%) | 2-5 días | 25% | 🟡 Regular |
-| Q4 (100%) | 5-287 días | 25% | 🔴 Problemático |
+| Q1 (25%) | 0-1 días | 25% | Excelente |
+| Q2 (50%) | 1-2 días | 25% | Bueno |
+| Q3 (75%) | 2-5 días | 25% | Regular |
+| Q4 (100%) | 5-287 días | 25% | Problemático |
 
 ### Interpretación
 
@@ -127,11 +127,11 @@ Analizar el comportamiento de los reportes de agua en la Ciudad de México para 
 
 | Colonia | Alcaldía | Incidentes | Reportes | Promedio Reportes/Incidente | Score Criticidad | Categoría |
 |---------|----------|------------|----------|------------------------------|------------------|-----------|
-| San Miguel Teotongo | Iztapalapa | 1,245 | 3,567 | 2.86 | 1,583 | 🔴 Crítica |
-| Lindavista | Gustavo A. Madero | 987 | 2,345 | 2.38 | 1,298 | 🔴 Crítica |
-| Santa Fe | Álvaro Obregón | 856 | 2,123 | 2.48 | 1,145 | 🔴 Crítica |
-| Padierna | Tlalpan | 743 | 1,987 | 2.67 | 1,023 | 🔴 Crítica |
-| Del Valle Sur | Benito Juárez | 623 | 1,456 | 2.34 | 867 | 🔴 Crítica |
+| San Miguel Teotongo | Iztapalapa | 1,245 | 3,567 | 2.86 | 1,583 | Crítica |
+| Lindavista | Gustavo A. Madero | 987 | 2,345 | 2.38 | 1,298 | Crítica |
+| Santa Fe | Álvaro Obregón | 856 | 2,123 | 2.48 | 1,145 | Crítica |
+| Padierna | Tlalpan | 743 | 1,987 | 2.67 | 1,023 | Crítica |
+| Del Valle Sur | Benito Juárez | 623 | 1,456 | 2.34 | 867 | Crítica |
 
 ### Interpretación del Score de Criticidad
 
@@ -172,10 +172,10 @@ Score = (Total Incidentes × 0.4) + (Total Reportes × 0.3) + (Promedio Reportes
 
 | Horario | Lunes-Viernes | Sábado-Domingo | % Total | Categoría |
 |---------|---------------|----------------|---------|-----------|
-| 06:00-11:59 | 8,234 (28%) | 3,456 (22%) | 26% | 🌅 Mañana |
-| 12:00-17:59 | 10,567 (36%) | 5,234 (33%) | 35% | ☀️ Tarde |
-| 18:00-23:59 | 7,890 (27%) | 5,678 (36%) | 30% | 🌆 Noche |
-| 00:00-05:59 | 2,456 (9%) | 1,432 (9%) | 9% | 🌙 Madrugada |
+| 06:00-11:59 | 8,234 (28%) | 3,456 (22%) | 26% | Mañana |
+| 12:00-17:59 | 10,567 (36%) | 5,234 (33%) | 35% | Tarde |
+| 18:00-23:59 | 7,890 (27%) | 5,678 (36%) | 30% | Noche |
+| 00:00-05:59 | 2,456 (9%) | 1,432 (9%) | 9% | Madrugada |
 
 ### Pico de Demanda por Día
 
@@ -217,11 +217,11 @@ Score = (Total Incidentes × 0.4) + (Total Reportes × 0.3) + (Promedio Reportes
 
 | Colonia | Problema | Veces Reportado | Días entre 1º y Último | Nivel Reincidencia |
 |---------|----------|-----------------|------------------------|-------------------|
-| San Miguel Teotongo | Fuga | 89 | 345 días | 🔴 Muy Alta |
-| Lindavista | Falta de agua | 67 | 312 días | 🔴 Muy Alta |
-| Santa Fe | Drenaje Obstruido | 54 | 289 días | 🔴 Muy Alta |
-| Padierna | Fuga | 48 | 267 días | 🔴 Alta |
-| Del Valle Sur | Falta de agua | 43 | 234 días | 🔴 Alta |
+| San Miguel Teotongo | Fuga | 89 | 345 días | Muy Alta |
+| Lindavista | Falta de agua | 67 | 312 días | Muy Alta |
+| Santa Fe | Drenaje Obstruido | 54 | 289 días | Muy Alta |
+| Padierna | Fuga | 48 | 267 días | Alta |
+| Del Valle Sur | Falta de agua | 43 | 234 días | Alta |
 
 ### Interpretación
 
@@ -272,24 +272,24 @@ Solución Preventiva (reemplazo):
 
 | Cluster | Alcaldía | Lat/Long | Incidentes | Colonias en Cluster | Densidad | Categoría |
 |---------|----------|----------|------------|---------------------|----------|-----------|
-| C1 | Iztapalapa | 19.35, -99.07 | 2,345 | 12 | 195.4 | 🔴 Crítica |
-| C2 | Gustavo A. Madero | 19.48, -99.12 | 1,987 | 9 | 220.8 | 🔴 Crítica |
-| C3 | Álvaro Obregón | 19.36, -99.25 | 1,678 | 8 | 209.8 | 🔴 Crítica |
-| C4 | Tlalpan | 19.28, -99.16 | 1,456 | 11 | 132.4 | 🟡 Alta Demanda |
+| C1 | Iztapalapa | 19.35, -99.07 | 2,345 | 12 | 195.4 | Crítica |
+| C2 | Gustavo A. Madero | 19.48, -99.12 | 1,987 | 9 | 220.8 | Crítica |
+| C3 | Álvaro Obregón | 19.36, -99.25 | 1,678 | 8 | 209.8 | Crítica |
+| C4 | Tlalpan | 19.28, -99.16 | 1,456 | 11 | 132.4 | Alta Demanda |
 
 ### Mapa de Calor (Conceptual)
 
 ```
-        🟢 = Baja (< 500 incidentes)
-        🟡 = Media (500-1000)
-        🟠 = Alta (1000-2000)
-        🔴 = Crítica (> 2000)
+        [B] = Baja (< 500 incidentes)
+        [M] = Media (500-1000)
+        [A] = Alta (1000-2000)
+        [C] = Crítica (> 2000)
 
     -99.30  -99.20  -99.10  -99.00
-19.50  🟢      🔴      🟡      🟢
-19.40  🟠      🟡      🔴      🟢
-19.30  🔴      🟢      🔴      🟡
-19.20  🟡      🟠      🟢      🟢
+19.50   [B]     [C]     [M]     [B]
+19.40   [A]     [M]     [C]     [B]
+19.30   [C]     [B]     [C]     [M]
+19.20   [M]     [A]     [B]     [B]
 ```
 
 ### Interpretación
@@ -331,11 +331,11 @@ Solución Preventiva (reemplazo):
 
 | Medio de Recepción | Total Reportes | % del Total | Días Promedio Atención | Categoría Velocidad | Ranking |
 |-------------------|----------------|-------------|------------------------|---------------------|---------|
-| Ciudadano (Call Center) | 287,456 | 91.6% | 2.1 días | 🟢 Bueno | 1 |
-| Redes Sociales | 18,234 | 5.8% | 3.4 días | 🟡 Regular | 3 |
-| App Móvil | 5,678 | 1.8% | 1.7 días | 🟢 Excelente | 2 |
-| Correo Electrónico | 1,234 | 0.4% | 5.6 días | 🔴 Lento | 4 |
-| Ventanilla SACMEX | 1,156 | 0.4% | 4.2 días | 🟡 Regular | 5 |
+| Ciudadano (Call Center) | 287,456 | 91.6% | 2.1 días | Bueno | 1 |
+| Redes Sociales | 18,234 | 5.8% | 3.4 días | Regular | 3 |
+| App Móvil | 5,678 | 1.8% | 1.7 días | Excelente | 2 |
+| Correo Electrónico | 1,234 | 0.4% | 5.6 días | Lento | 4 |
+| Ventanilla SACMEX | 1,156 | 0.4% | 4.2 días | Regular | 5 |
 
 ### Gráfica de Distribución
 
@@ -454,9 +454,9 @@ Donde cada componente pondera:
 | Periodo | Agua Potable | Drenaje | Total | Variación vs Trimestre Anterior |
 |---------|--------------|---------|-------|--------------------------------|
 | Q1-2022 | 38,456 | 15,234 | 53,690 | - |
-| Q2-2022 | 52,890 | 18,567 | 71,457 | +33.1% 🔴 |
-| Q3-2022 | 48,234 | 22,345 | 70,579 | -1.2% 🟢 |
-| Q4-2022 | 41,567 | 19,890 | 61,457 | -12.9% 🟢 |
+| Q2-2022 | 52,890 | 18,567 | 71,457 | +33.1% |
+| Q3-2022 | 48,234 | 22,345 | 70,579 | -1.2% |
+| Q4-2022 | 41,567 | 19,890 | 61,457 | -12.9% |
 
 ### Análisis de Estacionalidad
 
@@ -527,31 +527,6 @@ Donde cada componente pondera:
 4. **Brecha Digital:** Solo 2% de reportes via digital, perdiendo eficiencia potencial
 
 5. **Tiempo de Respuesta:** 50% atendidos en ≤2 días (bueno), pero 25% en >5 días (mejorable)
-
-### Recomendaciones Estratégicas
-
-**Corto Plazo (0-6 meses):**
-- Implementar sistema de escalación automática para reportes >5 días
-- Campaña de adopción de App Móvil (meta: 15% de reportes)
-- Reforzar brigadas en Q2 (40% adicional)
-
-**Mediano Plazo (6-18 meses):**
-- Reemplazar infraestructura en top 20 ubicaciones recurrentes
-- Sistema de monitoreo IoT en clusters críticos
-- Programa de mantenimiento preventivo por scoring
-
-**Largo Plazo (18-36 meses):**
-- Modernización integral zona oriente ($150M MXN)
-- Sistema predictivo con ML para anticipar fallas
-- Plataforma unificada multi-canal con IA
-
-### Impacto Esperado
-
-**Resultados esperados con la implementación total del proyecto:**
-- Reducción 35% en incidentes recurrentes
-- Tiempo promedio de atención: 2.3 → 1.5 días
-- Ahorro operativo estimado: $25M MXN/año
-- Satisfacción ciudadana: +40 puntos NPS
 
 ---
 

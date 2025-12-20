@@ -7,6 +7,16 @@
 
 **Fecha de entrega:** 20 de diciembre del 2025
 
+## Documentación del Proyecto
+
+- **INICIO_RAPIDO.md**: Guía rápida para levantar el sistema en 5 minutos
+- **GUIA_IMPLEMENTACION.md**: Detalles técnicos de implementación y troubleshooting
+- **GUIA_POSTMAN.md**: Ejemplos prácticos para probar la API con Postman
+- **diagrama_er_5nf.md**: Documentación técnica del modelo de datos normalizado
+- **ANALISIS_RESULTADOS.md**: Resultados e interpretación del análisis de datos
+- **RESUMEN_PROYECTO.md**: Checklist de cumplimiento de requisitos
+- **api/README_API.md**: Documentación completa de la API REST
+
 ---
 
 ## A) Introducción al conjunto de datos y al problema a estudiar
@@ -337,104 +347,22 @@ ALCALDIA(id_alcaldia, nombre_alcaldia)
 
 ## E) Archivos SQL del Proyecto
 
-El proyecto incluye los siguientes archivos SQL organizados para facilitar la implementación y uso del sistema normalizado:
+El proyecto incluye 7 archivos SQL organizados para facilitar la implementación:
 
 ### Archivos Principales
 
-####  `01_carga_inicial.sql`
-Script inicial para la carga de datos desde el archivo CSV original.
+1. **`01_carga_inicial.sql`**: Carga inicial de datos desde CSV
+2. **`02_analisis_exploratorio.sql`**: Análisis exploratorio y estadísticas descriptivas
+3. **`03_limpieza_datos.sql`**: Limpieza y transformación de datos
+4. **`04_schema_5nf.sql`**: Schema normalizado (7 tablas en 5NF)
+5. **`05_migracion_a_5nf.sql`**: Migración de datos a schema normalizado
+6. **`06_consultas_ejemplo_5nf.sql`**: Consultas de ejemplo organizadas por categoría
+7. **`07_analisis_avanzado.sql`**: Consultas avanzadas con window functions
 
-####  `02_analisis_exploratorio.sql`
-Consultas SQL para análisis exploratorio de datos, estadísticas descriptivas y detección de patrones en los reportes de agua.
-
-####  `03_limpieza_datos.sql`
-Procesos de limpieza y transformación de datos: eliminación de duplicados, normalización de valores, corrección de inconsistencias.
-
-####  `04_schema_5nf.sql` 
-**Schema de base de datos normalizado hasta 5NF MEJORADO**
-
-Define la estructura completa de las **7 tablas normalizadas**:
-1. **CLASIFICACION**: Catálogo de tipos de incidentes
-2. **MEDIO_RECEPCION**: Catálogo de canales de recepción
-3. **ALCALDIA**: Catálogo de alcaldías de la CDMX **← NUEVO**
-4. **ESTADO_INCIDENTE**: Catálogo de estados validados **← NUEVO**
-5. **COLONIA**: Datos geográficos con FK a alcaldía **← REFACTORIZADA**
-6. **INCIDENTE**: Entidad principal con coordenadas exactas **← MEJORADA**
-7. **REPORTE**: Registros individuales de notificaciones
-
-Incluye:
-- Claves primarias y foráneas (TODAS las relaciones validadas)
-- Índices optimizados para consultas frecuentes
-- Constraints de integridad referencial completa
-- Triggers para actualización automática de timestamps
-- Estados predefinidos poblados automáticamente
-- Comentarios detallados sobre el diseño mejorado
-
-####  `05_migracion_a_5nf.sql` 
-**Script de migración y carga de datos a 5NF MEJORADO**
-
-Transforma los datos del CSV original a las **7 tablas normalizadas** mediante:
-1. Verificación de datos limpios en tabla `reportes`
-2. Extracción y carga de catálogos independientes:
-   - CLASIFICACION (tipos de incidentes)
-   - MEDIO_RECEPCION (canales de recepción)
-   - **ALCALDIA (16 alcaldías de CDMX)** ← NUEVO
-3. Verificación de estados predefinidos (ESTADO_INCIDENTE)
-4. Normalización de COLONIA con FK a alcaldía
-5. Carga de INCIDENTE con coordenadas exactas y FK a estado
-6. Carga de REPORTE con integridad referencial completa
-7. Estadísticas detalladas y validación exhaustiva
-
-Características MEJORADAS:
-- Migración sin redundancia (alcaldías almacenadas 1 vez)
-- Todos los estados inicializados a "Registrado" (id_estado=1)
-- Diferenciación de centroide de colonia vs punto de incidente
-- Validación de todas las FKs (cero registros huérfanos)
-- Reportes estadísticos por dimensión (alcaldía, estado, etc.)
-- Manejo robusto de duplicados con ON CONFLICT
-
-####  `06_consultas_ejemplo_5nf.sql` 
-**Consultas de ejemplo y análisis MEJORADAS**
-
-Colección de consultas SQL organizadas por categoría:
-
-**Consultas Básicas:**
-- Listar todas las entidades con sus relaciones
-- Ver incidentes y reportes con información completa
-
-**Análisis Estadísticos:**
-- Distribución por clasificación, medio de recepción, alcaldía
-- **Análisis por estado de incidente** ← NUEVO
-- Top colonias con más incidentes
-- **Top alcaldías con más incidentes** ← MEJORADO (sin duplicados por variaciones)
-- Incidentes por tipo de problema predominante por alcaldía
-
-**Análisis Temporales:**
-- Incidentes por mes, día de la semana, hora del día
-- Evolución de estados a través del tiempo
-
-**Consultas Avanzadas:**
-- Incidentes con múltiples reportes
-- Matriz clasificación vs alcaldía (sin redundancia)
-- **Análisis geoespaciales mejorados** (centroide vs punto exacto) ← NUEVO
-- **Porcentaje de incidentes geolocalizados por alcaldía** ← NUEVO
-
-**Calidad de Datos:**
-- Validación de todas las FKs
-- Detección de registros incompletos
-- **Verificación de integridad referencial completa** ← MEJORADO
-
-**Vistas Útiles:**
-- `v_incidentes_completos` (ahora incluye estado y alcaldía)
-- `v_reportes_completos` (información completa con todas las relaciones)
-- `v_estadisticas_alcaldia` (agregaciones por alcaldía) ← NUEVA
-
-###  Orden de Ejecución Recomendado
-
-Para implementar el sistema completo desde cero:
+### Orden de Ejecución
 
 ```bash
-# 1. Crear el schema normalizado (7 tablas)
+# 1. Crear el schema normalizado
 psql -U usuario -d reportes_agua_cdmx -f 04_schema_5nf.sql
 
 # 2. Ejecutar la migración de datos
@@ -444,54 +372,20 @@ psql -U usuario -d reportes_agua_cdmx -f 05_migracion_a_5nf.sql
 psql -U usuario -d reportes_agua_cdmx -f 06_consultas_ejemplo_5nf.sql
 ```
 
-📖 **Para instrucciones detalladas paso a paso, incluyendo solución de problemas y métodos alternativos de carga, consultar:** [`GUIA_IMPLEMENTACION.md`](GUIA_IMPLEMENTACION.md)
+**Para instrucciones detalladas:** Ver `GUIA_IMPLEMENTACION.md`
 
-###  Beneficios del Diseño en 5NF MEJORADO
+**Para inicio rápido:** Ver `INICIO_RAPIDO.md`
 
-1. **Eliminación TOTAL de redundancia**: 
-   - Alcaldías almacenadas 1 vez (no N veces)
-   - Estados validados centralmente
-   - Cero duplicación de nombres de catálogos
+### Tablas del Schema 5NF
 
-2. **Integridad referencial COMPLETA**: 
-   - Todas las relaciones con FK validadas
-   - Estados validados (no más typos en VARCHAR)
-   - Alcaldías centralizadas (cambios en cascada)
+1. **CLASIFICACION**: Catálogo de tipos de incidentes
+2. **MEDIO_RECEPCION**: Catálogo de canales de recepción
+3. **ALCALDIA**: Catálogo de alcaldías de la CDMX
+4. **ESTADO_INCIDENTE**: Catálogo de estados validados
+5. **COLONIA**: Datos geográficos con FK a alcaldía
+6. **INCIDENTE**: Entidad principal con coordenadas exactas
+7. **REPORTE**: Registros individuales de notificaciones
 
-3. **Mantenimiento simplificado**: 
-   - Actualizar alcaldía = 1 UPDATE (no N)
-   - Agregar nuevo estado = 1 INSERT
-   - Deshabilitar catálogos sin eliminar datos
-
-4. **Granularidad geoespacial mejorada**:
-   - Centroide de colonia (área general)
-   - Coordenadas exactas de incidente (punto específico)
-   - Permite análisis geoespaciales precisos
-
-5. **Escalabilidad**: 
-   - Fácil agregar atributos a alcaldías (población, área, etc.)
-   - Nuevos estados sin cambiar código
-   - Extensible para futuras necesidades
-
-6. **Performance optimizado**: 
-   - Índices en todas las FKs
-   - JOINs por INTEGER más rápidos que VARCHAR
-   - Menor uso de almacenamiento (sin redundancia)
-
-7. **Sin anomalías**: 
-   - No hay problemas de inserción
-   - No hay problemas de actualización
-   - No hay problemas de eliminación
-   - **VERDADERA 5NF** alcanzada
-
-###  Verificación del Diseño
-
-El diseño puede verificarse reconstruyendo la tabla original mediante un JOIN completo de las **7 tablas**, demostrando que la descomposición es **sin pérdida de información** (lossless decomposition), requisito fundamental de la normalización hasta 5NF.
-
-Además, se puede verificar que:
--  No existen dependencias transitivas (colonia→alcaldía ahora es FK)
--  Todos los dominios finitos son catálogos validados
--  No hay repetición de valores en ninguna tabla
--  Todas las relaciones están formalizadas con FKs
+**Para detalles técnicos del modelo:** Ver `diagrama_er_5nf.md`
 
 
