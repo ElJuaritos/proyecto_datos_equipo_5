@@ -258,11 +258,5 @@ DELETE /incidentes/5000
 
 ---
 
-## Recursos
-
-- **Swagger UI**: http://localhost:8000/docs (recomendado para pruebas rápidas)
-- **ReDoc**: http://localhost:8000/redoc
-- **OpenAPI**: http://localhost:8000/openapi.json
-
 
 

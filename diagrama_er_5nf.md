@@ -573,5 +573,4 @@ Para sistemas analíticos (OLAP) de alto volumen, se puede considerar:
 ---
 
 **Fecha de actualización**: 19 Diciembre 2025  
-**Versión**: 2.0 - 5NF Verdadera  
 **Cambios**: Agregadas tablas ALCALDIA y ESTADO_INCIDENTE, refactorizada COLONIA
