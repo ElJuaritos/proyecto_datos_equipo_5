@@ -339,7 +339,6 @@ ALCALDIA(id_alcaldia, nombre_alcaldia)
 -  **Sin anomalías** de inserción, actualización o eliminación
 -  **Granularidad geoespacial mejorada** (centroide + punto exacto)
 
-<img width="2283" height="2503" alt="Untitled diagram-2025-12-01-170852" src="https://github.com/user-attachments/assets/4a27c515-fa49-4019-8c4f-6a6ce5a7bb0e" />
 
 **Para ver el diagrama ER detallado con cardinalidades, dependencias funcionales y ejemplos, consultar:** [`diagrama_er_5nf.md`](diagrama_er_5nf.md)
 

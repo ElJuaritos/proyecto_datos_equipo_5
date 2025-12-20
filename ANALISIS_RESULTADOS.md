@@ -115,46 +115,7 @@ Analizar el comportamiento de los reportes de agua en la Ciudad de México para 
 
 ---
 
-## 4. Análisis de Frecuencia y Criticidad por Colonia
-
-### Consulta
-```sql
--- Ver consulta #4 en 07_analisis_avanzado.sql
--- Crea score de criticidad compuesto
-```
-
-### Colonias Críticas - Top 10
-
-| Colonia | Alcaldía | Incidentes | Reportes | Promedio Reportes/Incidente | Score Criticidad | Categoría |
-|---------|----------|------------|----------|------------------------------|------------------|-----------|
-| San Miguel Teotongo | Iztapalapa | 1,245 | 3,567 | 2.86 | 1,583 | Crítica |
-| Lindavista | Gustavo A. Madero | 987 | 2,345 | 2.38 | 1,298 | Crítica |
-| Santa Fe | Álvaro Obregón | 856 | 2,123 | 2.48 | 1,145 | Crítica |
-| Padierna | Tlalpan | 743 | 1,987 | 2.67 | 1,023 | Crítica |
-| Del Valle Sur | Benito Juárez | 623 | 1,456 | 2.34 | 867 | Crítica |
-
-### Interpretación del Score de Criticidad
-
-**Fórmula del Score:**
-```
-Score = (Total Incidentes × 0.4) + (Total Reportes × 0.3) + (Promedio Reportes/Incidente × 10 × 0.3)
-```
-
-**Componentes:**
-- **40%** - Volumen absoluto de incidentes (magnitud del problema)
-- **30%** - Volumen de reportes (impacto en atención ciudadana)
-- **30%** - Ratio reportes/incidente (nivel de insistencia/urgencia percibida)
-
-### Hallazgos Clave
-
-**Descubrimiento:** Colonias con alto ratio reportes/incidente (>2.5) indican:
-1. **Ciudadanos más activos** en exigir soluciones
-2. **Problemas no resueltos** que generan múltiples llamadas
-3. **Falta de comunicación** sobre estatus de atención
-
----
-
-## 5. Patrones Horarios de Demanda
+## 4. Patrones Horarios de Demanda
 
 ### Consulta
 ```sql
@@ -194,7 +155,7 @@ Score = (Total Incidentes × 0.4) + (Total Reportes × 0.3) + (Promedio Reportes
 
 ---
 
-## 6. Incidentes Recurrentes
+## 5. Incidentes Recurrentes
 
 ### Consulta
 ```sql
@@ -238,7 +199,7 @@ Score = (Total Incidentes × 0.4) + (Total Reportes × 0.3) + (Promedio Reportes
 
 ---
 
-## 7. Clustering Geográfico
+## 6. Clustering Geográfico
 
 ### Consulta
 ```sql
@@ -296,7 +257,7 @@ Score = (Total Incidentes × 0.4) + (Total Reportes × 0.3) + (Promedio Reportes
 
 ---
 
-## 8. Eficiencia por Canal de Recepción
+## 7. Eficiencia por Canal de Recepción
 
 ### Consulta
 ```sql
@@ -349,65 +310,7 @@ Ventanilla █ 0.4%
 
 ---
 
-## 9. Scorecard Comparativo de Alcaldías
-
-### Consulta
-```sql
--- Ver consulta #9 en 07_analisis_avanzado.sql
--- Crea score de prioridad multi-dimensional
-```
-
-### Ranking de Alcaldías
-
-| Alcaldía | Incidentes | Colonias Afectadas | Inc/Colonia | Días Atención | Ranking Incidentes | Ranking Densidad | Score Prioridad |
-|----------|------------|-------------------|-------------|---------------|-------------------|------------------|-----------------|
-| Iztapalapa | 45,678 | 234 | 195.2 | 2.8 | 1 | 1 | 95.3 |
-| Gustavo A. Madero | 38,234 | 198 | 193.1 | 2.4 | 2 | 2 | 88.7 |
-| Álvaro Obregón | 28,567 | 145 | 197.0 | 2.1 | 3 | 3 | 79.4 |
-| Tlalpan | 24,123 | 182 | 132.5 | 2.5 | 4 | 8 | 68.2 |
-| Coyoacán | 21,456 | 124 | 173.0 | 1.9 | 5 | 4 | 65.8 |
-
-### Componentes del Score de Prioridad
-
-**Fórmula:**
-```
-Score = (Ranking_Incidentes × 40%) + (Ranking_Densidad × 30%) + (Ranking_Rapidez × 30%)
-```
-
-Donde cada componente pondera:
-- **40%** - Volumen absoluto (magnitud del problema)
-- **30%** - Densidad por colonia (severidad relativa)
-- **30%** - Rapidez de atención (eficiencia operativa invertida)
-
-### Interpretación por Alcaldía
-
-**Iztapalapa (Score: 95.3) - PRIORIDAD MÁXIMA**
-- **Situación:** Concentra el mayor número absoluto de incidentes (45,678) y la mayor densidad (195 por colonia)
-- **Reto:** Infraestructura obsoleta en zona de alta marginación
-- **Inversión requerida:** $150M MXN en 3 años
-- **Estrategia:** Proyecto integral de renovación por sectores
-
-**Gustavo A. Madero (Score: 88.7) - PRIORIDAD ALTA**
-- **Situación:** Segundo lugar en volumen (38,234) con buena eficiencia de atención (2.4 días)
-- **Fortaleza:** Mejor organización operativa
-- **Área de mejora:** Prevención en lugar de reacción
-- **Estrategia:** Mantenimiento preventivo intensivo
-
-**Álvaro Obregón (Score: 79.4) - PRIORIDAD ALTA**
-- **Situación:** Tercero en volumen pero primero en densidad relativa (197)
-- **Reto:** Colonias pequeñas con problemas severos
-- **Particularidad:** Santa Fe (zona de gran desarrollo) coexiste con colonias populares
-- **Estrategia:** Enfoque diferenciado por zona
-
-**Alcaldías de Menor Prioridad (Score < 50):**
-- Milpa Alta, Cuajimalpa, Magdalena Contreras
-- Menor densidad poblacional
-- Problemas puntuales, no sistemáticos
-- Estrategia: Mantenimiento regular programado
-
----
-
-## 10. Estacionalidad y Tendencias Anuales
+## 8. Estacionalidad y Tendencias Anuales
 
 ### Consulta
 ```sql
