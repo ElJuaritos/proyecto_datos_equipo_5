@@ -624,5 +624,5 @@ Puedes importar automáticamente todos los endpoints:
 5. Buscar y filtrar
 6. Eliminar registros de prueba
 
-**¡Buena suerte con las pruebas!** 🚀
+
 
