@@ -9,8 +9,6 @@
 
 ## Documentación del Proyecto
 
-- **INICIO_RAPIDO.md**: Guía rápida para levantar el sistema en 5 minutos
-- **GUIA_IMPLEMENTACION.md**: Detalles técnicos de implementación y troubleshooting
 - **GUIA_POSTMAN.md**: Ejemplos prácticos para probar la API con Postman
 - **diagrama_er_5nf.md**: Documentación técnica del modelo de datos normalizado
 - **ANALISIS_RESULTADOS.md**: Resultados e interpretación del análisis de datos
@@ -371,10 +369,6 @@ psql -U usuario -d reportes_agua_cdmx -f 05_migracion_a_5nf.sql
 psql -U usuario -d reportes_agua_cdmx -f 06_consultas_ejemplo_5nf.sql
 ```
 
-**Para instrucciones detalladas:** Ver `GUIA_IMPLEMENTACION.md`
-
-**Para inicio rápido:** Ver `INICIO_RAPIDO.md`
-
 ### Tablas del Schema 5NF
 
 1. **CLASIFICACION**: Catálogo de tipos de incidentes
@@ -387,4 +381,226 @@ psql -U usuario -d reportes_agua_cdmx -f 06_consultas_ejemplo_5nf.sql
 
 **Para detalles técnicos del modelo:** Ver `diagrama_er_5nf.md`
 
+---
+
+## F) Análisis Avanzado de Datos
+
+Se realizaron 8 análisis avanzados utilizando funciones de ventana (window functions) de SQL para identificar patrones, tendencias y áreas críticas en el sistema de reportes de agua.
+
+### Consultas Analíticas Implementadas
+
+**1. Ranking de Colonias Más Afectadas**
+- Utiliza `RANK()` y `PARTITION BY` para clasificar colonias por alcaldía
+- Identifica las 10 colonias con mayor número de incidentes
+- Principales afectadas: San Miguel Teotongo (Iztapalapa), Lindavista (Gustavo A. Madero), Santa Fe (Álvaro Obregón)
+
+**2. Tendencia Temporal de Reportes**
+- Utiliza `LAG()` para comparar reportes entre periodos consecutivos
+- Calcula variaciones mensuales y medias móviles
+- Hallazgo clave: Incremento del 41% entre febrero y marzo 2022
+
+**3. Tiempo de Atención a Reportes**
+- Calcula estadísticas de tiempo de respuesta usando percentiles
+- 50% de reportes atendidos en ≤2 días (bueno)
+- 25% tarda más de 5 días (área de mejora)
+- Percentil 90: 7 días, Percentil 95: 15 días
+
+**4. Patrones Horarios de Demanda**
+- Analiza distribución horaria con `RANK()` por día de la semana
+- Concentración: 35% de reportes entre 12:00-18:00 hrs
+- Picos: Lunes a viernes 14:00-16:00 hrs
+- Madrugada (00:00-06:00): Solo 9% pero probablemente urgencias
+
+**5. Incidentes Recurrentes**
+- Identifica ubicaciones con problemas repetitivos
+- San Miguel Teotongo: 89 reportes de fuga en 345 días
+- Indica problemas estructurales no resueltos
+- Sugiere necesidad de reemplazo de infraestructura vs. reparaciones temporales
+
+**6. Clustering Geográfico**
+- Agrupa incidentes por coordenadas para identificar zonas críticas
+- Concentración en zona oriente: Iztapalapa y Gustavo A. Madero
+- Clusters críticos: >190 incidentes por colonia (vs. promedio de 75)
+- Análisis de causa raíz: infraestructura antigua (>50 años) + alta densidad poblacional
+
+**7. Eficiencia por Canal de Recepción**
+- Compara tiempos de atención por medio de recepción
+- Call Center: 91.6% de reportes, 2.1 días promedio
+- App Móvil: Solo 1.8% pero mejor tiempo (1.7 días)
+- Oportunidad: Migrar reportes digitales para reducir carga operativa
+
+**8. Estacionalidad y Tendencias Anuales**
+- Analiza patrones trimestrales de reportes
+- Q2 (Abr-Jun): +33% vs Q1 - temporada crítica por estiaje
+- Q3 (Jul-Sep): Mantiene nivel alto, problemas de drenaje
+- Q4 (Oct-Dic): Normalización -13%
+
+### Hallazgos Principales
+
+1. **Concentración Geográfica**: 40% de incidentes en 15% de colonias (zona oriente)
+2. **Estacionalidad**: Q2 requiere 50% más recursos que Q1
+3. **Reincidencia**: Top 100 ubicaciones representan 60% del trabajo reactivo
+4. **Brecha Digital**: Solo 2% de reportes vía digital
+5. **Tiempo de Respuesta**: 50% en ≤2 días, pero 25% en >5 días
+
+### Funciones de Ventana Utilizadas
+
+- **`RANK()`**: Clasificación con huecos en caso de empates
+- **`DENSE_RANK()`**: Clasificación sin huecos
+- **`ROW_NUMBER()`**: Numeración única secuencial
+- **`LAG()` / `LEAD()`**: Comparaciones con registros anteriores/siguientes
+- **`PARTITION BY`**: Agrupación para cálculos por categoría
+- **`NTILE()`**: División en cuartiles/percentiles
+- **Window Frames**: Medias móviles y agregaciones deslizantes
+
+**Para análisis detallado con interpretaciones y recomendaciones:** Ver [`ANALISIS_RESULTADOS.md`](ANALISIS_RESULTADOS.md)
+
+**Script SQL con todas las consultas:** [`07_analisis_avanzado.sql`](07_analisis_avanzado.sql)
+
+---
+
+## G) API REST con FastAPI
+
+Se implementó una API RESTful completa con FastAPI que proporciona operaciones CRUD para las 7 tablas normalizadas y funcionalidades avanzadas de análisis y estadísticas.
+
+### Características Principales
+
+- **7 Tablas Normalizadas**: CRUD completo para Clasificación, Medio Recepción, Alcaldía, Estado Incidente, Colonia, Incidente y Reporte
+- **Validaciones Automáticas**: Integridad referencial y validación de datos con Pydantic
+- **Filtros y Paginación**: Búsquedas avanzadas por estado, alcaldía, clasificación
+- **Dashboard y Estadísticas**: Análisis en tiempo real del sistema
+- **Búsqueda Geoespacial**: Incidentes por radio usando fórmula de Haversine
+- **Actualización Masiva**: Cambio de estado de múltiples incidentes
+
+### Configuración Rápida
+
+```bash
+cd api
+python -m venv venv
+venv\Scripts\activate  # Windows
+pip install -r requirements.txt
+copy env.example .env  # Configurar credenciales PostgreSQL
+python main.py
+```
+
+Acceder a: **http://localhost:8000/docs**
+
+### Ejemplos de Pruebas con Postman
+
+#### 1. Configuración Inicial
+
+En Postman, crear variable de entorno:
+- **Variable:** `base_url`
+- **Valor:** `http://localhost:8000`
+
+#### 2. Pruebas Básicas CRUD
+
+**Listar clasificaciones:**
+```
+GET {{base_url}}/clasificaciones/
+```
+
+**Crear nueva colonia:**
+```
+POST {{base_url}}/colonias/
+Body (JSON):
+{
+    "nombre_colonia": "Polanco",
+    "id_alcaldia": 2,
+    "centroide_longitud": -99.1927,
+    "centroide_latitud": 19.4340,
+    "activo": true
+}
+```
+
+**Filtrar incidentes por estado:**
+```
+GET {{base_url}}/incidentes/?estado_id=1&limit=10
+```
+
+**Buscar incidente por folio:**
+```
+GET {{base_url}}/incidentes/folio/I-20220101-0001
+```
+
+#### 3. Funcionalidades Avanzadas
+
+**Dashboard general del sistema:**
+```
+GET {{base_url}}/estadisticas/dashboard
+```
+Retorna: totales, distribuciones por estado/clasificación, top alcaldías
+
+**Estadísticas por alcaldía:**
+```
+GET {{base_url}}/estadisticas/alcaldia/1
+```
+Retorna: incidentes, colonias afectadas, clasificaciones top
+
+**Análisis temporal:**
+```
+GET {{base_url}}/estadisticas/temporal?fecha_inicio=2024-01-01&fecha_fin=2024-12-31&agrupacion=mes
+```
+Retorna: serie temporal de incidentes por mes/semana/día
+
+**Búsqueda geoespacial por radio:**
+```
+GET {{base_url}}/incidentes/buscar/por-radio?longitud=-99.1332&latitud=19.4326&radio_km=2&limit=50
+```
+Retorna: incidentes dentro del radio especificado
+
+**Zonas críticas:**
+```
+GET {{base_url}}/estadisticas/zonas-criticas?limit=10
+```
+Retorna: ranking de colonias con más incidentes
+
+**Actualización masiva de estado:**
+```
+POST {{base_url}}/incidentes/actualizar-estado-masivo
+Body (JSON):
+{
+    "ids_incidentes": [1, 2, 3, 4, 5],
+    "nuevo_estado_id": 3
+}
+```
+Retorna: total actualizado, IDs exitosos/fallidos
+
+#### 4. Flujo de Trabajo Ejemplo
+
+1. Ver dashboard para identificar incidentes pendientes
+2. Obtener estadísticas de alcaldía más afectada
+3. Filtrar incidentes por estado "Registrado" en esa alcaldía
+4. Buscar incidentes cercanos geográficamente para planificar ruta
+5. Actualizar estado masivo después de atención
+6. Consultar zonas críticas para planificación preventiva
+
+### Importar Colección en Postman
+
+1. En Postman: **Import** → **Link**
+2. URL: `http://localhost:8000/openapi.json`
+3. Click **Import**
+
+Todos los endpoints estarán disponibles automáticamente organizados por categoría.
+
+### Endpoints Disponibles
+
+- **Clasificaciones**: `/clasificaciones/` (GET, POST, PUT, DELETE)
+- **Medios de Recepción**: `/medios-recepcion/`
+- **Alcaldías**: `/alcaldias/`
+- **Estados de Incidente**: `/estados-incidente/`
+- **Colonias**: `/colonias/`
+- **Incidentes**: `/incidentes/`
+- **Reportes**: `/reportes/`
+- **Estadísticas**: `/estadisticas/dashboard`, `/estadisticas/alcaldia/{id}`, `/estadisticas/temporal`, `/estadisticas/zonas-criticas`
+
+**Para ejemplos detallados de Postman:** Ver [`GUIA_POSTMAN.md`](GUIA_POSTMAN.md)
+
+**Para documentación completa de la API:** Ver [`README_API.md`](README_API.md)
+
+---
+
+**Proyecto:** Análisis de Reportes de Agua en Ciudad de México  
+**Equipo:** Carlos Emilio Elizalde Hurtado, Emilio Juarez Avalos, Juan Pablo Medina Esquivel  
+**Fecha:** 20 de diciembre del 2025
 
