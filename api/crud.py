@@ -169,7 +169,7 @@ def delete_alcaldia(db: Session, alcaldia_id: int) -> bool:
 
 
 # =====================================================
-# ESTADO_INCIDENTE CRUD (NUEVO)
+# ESTADO_INCIDENTE CRUD 
 # =====================================================
 
 def create_estado_incidente(db: Session, estado: schemas.EstadoIncidenteCreate) -> models.EstadoIncidente:
